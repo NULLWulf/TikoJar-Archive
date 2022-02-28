@@ -9,7 +9,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 public class CommandHandler {
     public static void main(String[] args) {
         DiscordApi api = new DiscordApiBuilder().setToken("" +
-                "OTM5NjA5NTU0MzUyNzYyODgw.Yf7Vlg.gah8DpVv9ONLnTTxcqzrWrKCh1g").setAllIntents().login().join();
+                "token").setAllIntents().login().join();
 
         api.addMessageCreateListener(event -> {
 
