@@ -21,15 +21,36 @@ public class CommandHandler {
                     // Proceed only if message begins with !tiko
                     if(messageContent.substring(0, 5).equalsIgnoreCase("!tiko")){
 
+                        // Determine whether message author is server admin
+                        boolean isAdmin = event.getMessageAuthor().isServerAdmin();
+
                         QueryHandler queryHandler = new QueryHandler(event);
 
-                        if(messageContent.length() >= 12){
+                        if(messageContent.length() >= 20){
 
-                            if (event.getMessageContent().substring(0,12).equalsIgnoreCase("" +
-                                    "!tiko create")){
+                            if (event.getMessageContent().substring(0,20).equalsIgnoreCase("" +
+                                    "!tiko delete message")){
 
                                 boolean validSyntax = true;
-                                boolean isAdmin = event.getMessageAuthor().isServerAdmin();
+
+                                // TODO: check for valid syntax, then update validSyntax boolean
+
+                            }
+
+                        } else if(messageContent.length() >= 19){
+
+                            if (event.getMessageContent().substring(0,19).equalsIgnoreCase("" +
+                                    "!tiko view messages")){
+
+                                queryHandler.viewMessages(isAdmin);
+
+                            }
+
+                        } else if(messageContent.length() >= 12){
+
+                            if (event.getMessageContent().substring(0,12).equalsIgnoreCase("!tiko create")){
+
+                                boolean validSyntax = true;
 
                                 // TODO: check syntax and update validSyntax boolean
 

@@ -53,9 +53,23 @@ public class QueryHandler {
             // TODO: query only the user's messages for jar
 
         }
+
+        // TODO: instantiate responseBuilder with response object
+        responseBuilder.viewMessagesResponse();
     }
 
-    public void deleteMessage(){
+    public void deleteMessage(boolean validSyntax){
+
+        boolean messageDeleted = true;
+
+        if(validSyntax){
+
+            // TODO: delete message if it exists
+            // TODO: update messageDeleted boolean
+
+        }
+
+        responseBuilder.deleteMessageResponse(validSyntax, messageDeleted);
 
     }
 

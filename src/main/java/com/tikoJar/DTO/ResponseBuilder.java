@@ -45,7 +45,7 @@ public class ResponseBuilder {
         if(!validSyntax){
 
             event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
-                    "Please go to OUR WEB URL to see how to create a jar.");
+                    "Please go to OUR WEB URL to see how to properly create a jar.");
 
         } else if(!isAdmin){
 
@@ -68,8 +68,17 @@ public class ResponseBuilder {
 
     }
 
-    public void deleteMessageResponse(){
-
+    public void deleteMessageResponse(boolean validSyntax, boolean messageDeleted){
+        if(!validSyntax){
+            event.getChannel().sendMessage("I'm sorry, I can't delete a message with those details. " +
+                    "Please go to OUR WEB URL to see how to properly delete a message.");
+        } else if(!messageDeleted){
+            event.getChannel().sendMessage("I'm sorry, I can't delete that message. Please make sure you " +
+                    "are entering the message ID correctly");
+        } else {
+            event.getChannel().sendMessage("" +
+                    "No problem, " + getNickname() + ", I have deleted that message for you");
+        }
     }
 
     public void deleteJarResponse(){
