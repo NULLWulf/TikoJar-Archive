@@ -8,7 +8,7 @@ MicroProfile and Jakarta EE versions that you previously selected.
 
 If you plan on developing and/or deploying your app in a containerized environment, the included Dockerfile 
 will make it easier to create your application image on top of the Open Liberty Docker image.
-
+Zach added this
 1) Once you download the starter project, unpackage the .zip file on your machine.
 2) If you selected Maven as your build tool, then open a command line session, navigate to the 
    installation directory, and run `mvnw liberty:run`. This will install all required dependencies and 
