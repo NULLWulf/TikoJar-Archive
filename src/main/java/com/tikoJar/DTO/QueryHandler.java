@@ -6,7 +6,6 @@ import org.javacord.api.event.message.MessageCreateEvent;
 public class QueryHandler {
     private MessageCreateEvent event;
     ResponseBuilder responseBuilder;
-    JsonObject jsonObject;
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
@@ -16,64 +15,111 @@ public class QueryHandler {
 
         boolean messageAdded = true;
 
-        // TODO: if server has jar, submit message, then store the message in it.
+        // TODO: if server has jar, store the message in it.
+        // TODO: else, messageAdded = false
 
-        // TODO: update messageAdded boolean
+        this.responseBuilder = new ResponseBuilder(null, event);
 
         responseBuilder.addMessageResponse(messageAdded);
 
+        if(messageAdded){
+
+            if(checkMessageLimit()){
+
+                // TODO: retrieve jar from database
+
+                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
+
+                responseBuilder.messageLimitEvent();
+
+                // TODO: delete server's jar
+
+            }
+        }
+
     }
 
-    public void createJar(boolean validCall, boolean isAdmin){
+    public void createJar(boolean validSyntax, boolean isAdmin){
 
-        boolean hasJar = true;
+        boolean hasJar = false;
 
-        if(validCall && isAdmin){
+        if(validSyntax && isAdmin){
 
             // TODO: check if server has jar.
-            // TODO: update hasJar boolean
             // TODO: if server does not have jar, store new jar in database.
+            // TODO: else, hasJar = true
 
         }
 
         this.responseBuilder = new ResponseBuilder(null, event);
 
-        responseBuilder.createJarResponse(validCall, isAdmin, hasJar);
+        responseBuilder.createJarResponse(validSyntax, isAdmin, hasJar);
 
     }
 
     public void viewMessages(boolean isAdmin){
 
-        if(isAdmin){
+        boolean hasJar = true;
 
-            // TODO: query all messages for jar
+        // TODO: verify that server has a jar
+        // TODO: else, hasJar = false
+
+        if(hasJar){
+
+            if(isAdmin){
+
+                // TODO: query all messages for jar
+
+            } else {
+
+                // TODO: query only the user's messages for jar
+
+            }
+
+            // TODO: instantiate responseBuilder with response object
 
         } else {
 
-            // TODO: query only the user's messages for jar
+            responseBuilder = new ResponseBuilder(null, event);
 
         }
 
-        // TODO: instantiate responseBuilder with response object
+
+
         responseBuilder.viewMessagesResponse();
     }
 
-    public void deleteMessage(boolean validSyntax){
+    public void deleteMessage(boolean includedMessageID, String messageID){
 
         boolean messageDeleted = true;
 
-        if(validSyntax){
+        if(includedMessageID){
 
             // TODO: delete message if it exists
-            // TODO: update messageDeleted boolean
+            // TODO: else, messageDeleted = false;
 
         }
 
-        responseBuilder.deleteMessageResponse(validSyntax, messageDeleted);
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
 
     }
 
-    public void deleteJar(){
+    public void deleteJar(boolean isAdmin){
+
+        boolean jarDeleted = true;
+
+        if(isAdmin){
+
+            // TODO: delete jar if it exists
+            // TODO: update jarDeleted boolean
+
+        }
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
 
     }
 
@@ -101,11 +147,24 @@ public class QueryHandler {
 
     }
 
-    public void checkMessageLimit(){
+    public boolean checkMessageLimit(){
+
+        boolean messageLimitReached = false;
+
+        // TODO: check if message limit has been reached
+        // TODO: if message limit is reached, set messageLimitReached = true;
+
+        return messageLimitReached;
 
     }
 
     public void checkTimeLimits(){
+
+        // TODO: query all jars that have time limits && the limit's date is <= today's date
+
+        // TODO: instantiate responseBuilder with response object
+
+        this.responseBuilder.timeLimitEvent();
 
     }
 

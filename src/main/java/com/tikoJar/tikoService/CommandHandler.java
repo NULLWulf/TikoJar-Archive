@@ -5,7 +5,9 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 public class CommandHandler {
+
     public static void main(String[] args) {
+
         DiscordApi api = new DiscordApiBuilder().setToken("" +
                 "OTM5NjA5NTU0MzUyNzYyODgw.Yf7Vlg.gah8DpVv9ONLnTTxcqzrWrKCh1g").setAllIntents().login().join();
 
@@ -31,18 +33,21 @@ public class CommandHandler {
                             if (event.getMessageContent().substring(0,20).equalsIgnoreCase("" +
                                     "!tiko delete message")){
 
-                                boolean validSyntax = true;
+                                boolean includedMessageID = true;
+                                String messageContents = event.getMessageContent();
+                                String messageID = "";
 
-                                // TODO: check for valid syntax, then update validSyntax boolean
+                                if(messageContents.length() < 22){
 
-                            }
+                                    includedMessageID = false;
 
-                        } else if(messageContent.length() >= 19){
+                                } else {
 
-                            if (event.getMessageContent().substring(0,19).equalsIgnoreCase("" +
-                                    "!tiko view messages")){
+                                    messageID = messageContents.substring(21);
 
-                                queryHandler.viewMessages(isAdmin);
+                                }
+
+                                queryHandler.deleteMessage(includedMessageID, messageID);
 
                             }
 
@@ -73,9 +78,14 @@ public class CommandHandler {
 
                                 queryHandler.getHelp();
 
-                            } else if (event.getMessageContent().equalsIgnoreCase("!Tiko view messages")) {
+                            } else if (event.getMessageContent().equalsIgnoreCase("!tiko view messages")) {
 
-                                queryHandler.viewMessages(event.getMessageAuthor().isServerAdmin());
+                                queryHandler.viewMessages(isAdmin);
+
+                            } else if(event.getMessageContent().equalsIgnoreCase("" +
+                                    "!tiko delete jar")) {
+
+                                queryHandler.deleteJar(isAdmin);
 
                             } else {
 
