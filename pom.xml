@@ -73,7 +73,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.codenamebear.rest.CommandHandler</mainClass>
+                            <mainClass>com.tikoJar.tikoService.CommandHandler</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

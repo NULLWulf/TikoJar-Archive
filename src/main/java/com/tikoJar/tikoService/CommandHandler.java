@@ -1,5 +1,6 @@
-package com.codenamebear.rest;
+package com.tikoJar.tikoService;
 
+import com.tikoJar.DTO.QueryHandler;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.server.Server;
@@ -33,7 +34,8 @@ public class CommandHandler {
                                 String nickname = getNickname(event);
                                 event.getChannel().sendMessage("Hi, " + nickname + "!");
                             } else if (event.getMessageContent().equalsIgnoreCase("!tiko help")){
-                                event.getChannel().sendMessage(getHelp());
+                                QueryHandler queryHandler = new QueryHandler(event);
+                                queryHandler.getHelp();
                             } else if (event.getMessageContent().equalsIgnoreCase("!Tiko view messages")) {
                                 event.getChannel().sendMessage("" +
                                         "Sorry, I'm still learning how to perform this task.");
@@ -51,14 +53,6 @@ public class CommandHandler {
                 }
             }).start();
         });
-    }
-
-    public static String getHelp(){
-        return ("**Here's a list of my commands:** ```" +
-                "!tiko add <message>\n" +
-                "!tiko hello\n") +
-                "!tiko help\n" +
-                "!tiko view messages```";
     }
 
     public static String getNickname(MessageCreateEvent event){

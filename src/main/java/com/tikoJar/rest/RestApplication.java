@@ -1,4 +1,4 @@
-package com.codenamebear.rest;
+package com.tikoJar.rest;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
