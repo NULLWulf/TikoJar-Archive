@@ -3,6 +3,8 @@ package com.tikoJar.DTO;
 import jakarta.json.JsonObject;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.time.LocalDate;
+
 public class QueryHandler {
     private MessageCreateEvent event;
     ResponseBuilder responseBuilder;
@@ -48,6 +50,10 @@ public class QueryHandler {
             // TODO: check if server has jar.
             // TODO: if server does not have jar, store new jar in database.
             // TODO: else, hasJar = true
+
+//            SUGGESTED METHODS:
+//            LocalDate creationDate = LocalDate.now();
+//            LocalDate openingDate = creationDate.plusDays(numberOfDays);
 
         }
 
