@@ -4,56 +4,84 @@ import com.tikoJar.DTO.QueryHandler;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
+import java.util.StringTokenizer;
+
+// TODO: Use enumeration
+// TODO: Check for tokens instead of char length
+
 public class CommandHandler {
+
+    private enum MethodID{
+
+        ADDMESSAGE("add"),
+        COMMANDPREFIX("!tiko"),
+        CREATEJAR("create"),
+        DELETEJAR("delete jar"),
+        DELETEMESSAGE("delete message"),
+        HELLO("hello"),
+        HELP("help"),
+        VIEWMESSAGES("view messages");
+
+        private String command;
+
+        MethodID(String command) {
+            this.command = command;
+        }
+
+        public String getCommand() {
+            return command;
+        }
+
+    }
 
     public static void main(String[] args) {
 
-        DiscordApi api = new DiscordApiBuilder().setToken("" +
-                "OTM5NjA5NTU0MzUyNzYyODgw.Yf7Vlg.gah8DpVv9ONLnTTxcqzrWrKCh1g").setAllIntents().login().join();
+        String token = TokenHandler.TOKEN;
+
+        DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
 
         api.addMessageCreateListener(event -> {
 
             new Thread(() -> {
 
-                String messageContent = event.getMessageContent();
+                String[] messageContent = event.getMessageContent().split("\\s");
 
-                // Proceed only if message is at least 5 characters
-                if(messageContent.length() >= 5){
+                // Proceed only if message has content
+                if (messageContent.length > 0) {
 
                     // Proceed only if message begins with !tiko
-                    if(messageContent.substring(0, 5).equalsIgnoreCase("!tiko")){
+                    if (messageContent[0].equalsIgnoreCase(MethodID.COMMANDPREFIX.getCommand())) {
 
                         // Determine whether message author is server admin
                         boolean isAdmin = event.getMessageAuthor().isServerAdmin();
 
                         QueryHandler queryHandler = new QueryHandler(event);
 
-                        if(messageContent.length() >= 20){
+                        if (messageContent.length >= 3) {
 
-                            if (event.getMessageContent().substring(0,20).equalsIgnoreCase("" +
-                                    "!tiko delete message")){
+                            if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
+
+                                queryHandler.addMessage();
+
+                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                    MethodID.DELETEMESSAGE.getCommand())) {
 
                                 boolean includedMessageID = true;
-                                String messageContents = event.getMessageContent();
                                 String messageID = "";
 
-                                if(messageContents.length() < 22){
+                                if (messageContent.length == 4) {
 
-                                    includedMessageID = false;
+                                    messageID = messageContent[3];
 
                                 } else {
 
-                                    messageID = messageContents.substring(21);
+                                    includedMessageID = false;
 
                                 }
 
                                 queryHandler.deleteMessage(includedMessageID, messageID);
 
-                            }
-
-                        } else if(messageContent.length() >= 12){
-
-                            if (event.getMessageContent().substring(0,12).equalsIgnoreCase("!tiko create")){
+                            } else if (messageContent[1].equalsIgnoreCase(MethodID.CREATEJAR.getCommand())) {
 
                                 boolean validSyntax = true;
 
@@ -61,31 +89,47 @@ public class CommandHandler {
 
                                 queryHandler.createJar(validSyntax, isAdmin);
 
+                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                    MethodID.VIEWMESSAGES.getCommand())) {
+
+                                if (messageContent.length > 3){
+
+                                    queryHandler.invalidCommand();
+
+                                } else {
+
+                                    queryHandler.viewMessages(isAdmin);
+
+                                }
+
+                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                    MethodID.DELETEJAR.getCommand())) {
+
+                                if (messageContent.length > 3){
+
+                                    queryHandler.invalidCommand();
+
+                                } else {
+
+                                    queryHandler.deleteJar(isAdmin);
+
+                                }
+
+                            } else {
+
+                                queryHandler.invalidCommand();
+
                             }
 
-                        } else if (messageContent.length() >= 10){
+                        } else if (messageContent.length >= 2) {
 
-                            // Check message contents for command and respond
-                            if (messageContent.substring(0, 10).equalsIgnoreCase("!tiko add ")){
-
-                                queryHandler.addMessage();
-
-                            } else if (event.getMessageContent().equalsIgnoreCase("!tiko hello")) {
+                            if (messageContent[1].equalsIgnoreCase(MethodID.HELLO.getCommand())) {
 
                                 queryHandler.hello();
 
-                            } else if (event.getMessageContent().equalsIgnoreCase("!tiko help")){
+                            } else if (messageContent[1].equalsIgnoreCase(MethodID.HELP.getCommand())) {
 
                                 queryHandler.getHelp();
-
-                            } else if (event.getMessageContent().equalsIgnoreCase("!tiko view messages")) {
-
-                                queryHandler.viewMessages(isAdmin);
-
-                            } else if(event.getMessageContent().equalsIgnoreCase("" +
-                                    "!tiko delete jar")) {
-
-                                queryHandler.deleteJar(isAdmin);
 
                             } else {
 
@@ -98,9 +142,15 @@ public class CommandHandler {
                             queryHandler.invalidCommand();
 
                         }
+
                     }
+
                 }
+
             }).start();
+
         });
+
     }
+
 }
