@@ -1,28 +1,29 @@
 package com.tikoJar.tikoService;
 
 import com.tikoJar.DTO.QueryHandler;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.constraints.Null;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 import java.util.StringTokenizer;
 
-// TODO: Use enumeration
-// TODO: Check for tokens instead of char length
-
 public class CommandHandler {
 
     private enum MethodID{
 
-        ADDMESSAGE("add"),
         COMMANDPREFIX("!tiko"),
+        ADDMESSAGE("add"),
         CREATEJAR("create"),
         DELETEJAR("delete jar"),
         DELETEMESSAGE("delete message"),
         HELLO("hello"),
         HELP("help"),
+        MESSAGELIMIT("m"),
+        TIMELIMIT("t"),
         VIEWMESSAGES("view messages");
 
-        private String command;
+        private final String command;
 
         MethodID(String command) {
             this.command = command;
@@ -55,8 +56,10 @@ public class CommandHandler {
                         // Determine whether message author is server admin
                         boolean isAdmin = event.getMessageAuthor().isServerAdmin();
 
+                        // Instantiate QueryHandler for method calls
                         QueryHandler queryHandler = new QueryHandler(event);
 
+                        // Determine number of words contained in user message
                         if (messageContent.length >= 3) {
 
                             if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
@@ -84,10 +87,48 @@ public class CommandHandler {
                             } else if (messageContent[1].equalsIgnoreCase(MethodID.CREATEJAR.getCommand())) {
 
                                 boolean validSyntax = true;
+                                int messageLimit = 0;
+                                int timeLimit = 0;
 
-                                // TODO: check syntax and update validSyntax boolean
+                                if (messageContent.length == 4) {
 
-                                queryHandler.createJar(validSyntax, isAdmin);
+                                    if (messageContent[2].equalsIgnoreCase(MethodID.MESSAGELIMIT.getCommand())){
+
+                                        try {
+
+                                            messageLimit = Integer.parseInt(messageContent[3]);
+
+                                        } catch (NumberFormatException nfe) {
+
+                                            validSyntax = false;
+
+                                        }
+
+                                    } else if (messageContent[2].equalsIgnoreCase(MethodID.TIMELIMIT.getCommand())){
+
+                                        try {
+
+                                            timeLimit = Integer.parseInt(messageContent[3]);
+
+                                        } catch (NumberFormatException nfe) {
+
+                                            validSyntax = false;
+
+                                        }
+
+                                    } else {
+
+                                        validSyntax = false;
+
+                                    }
+
+                                } else {
+
+                                    validSyntax = false;
+
+                                }
+
+                                queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.VIEWMESSAGES.getCommand())) {
