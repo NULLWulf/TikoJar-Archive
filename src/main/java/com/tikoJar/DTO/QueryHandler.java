@@ -41,19 +41,34 @@ public class QueryHandler {
 
     }
 
-    public void createJar(boolean validSyntax, boolean isAdmin){
+    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays){
 
         boolean hasJar = false;
 
         if(validSyntax && isAdmin){
 
-            // TODO: check if server has jar.
-            // TODO: if server does not have jar, store new jar in database.
-            // TODO: else, hasJar = true
+            // TODO: check if server has jar. If it does, set hasJar to true.
 
-//            SUGGESTED METHODS:
-//            LocalDate creationDate = LocalDate.now();
-//            LocalDate openingDate = creationDate.plusDays(numberOfDays);
+            if (!hasJar){
+
+                if (messageLimit != 0){
+
+                    // TODO: Store jar with message limit in database
+
+                    // SUGGESTED METHOD:
+                    // LocalDate creationDate = LocalDate.now();
+
+                } else {
+
+                    // TODO: Store jar with time limit in database
+
+                    // SUGGESTED METHODS:
+                    // LocalDate creationDate = LocalDate.now();
+                    // LocalDate openingDate = creationDate.plusDays(timeLimitInDays);
+
+                }
+
+            }
 
         }
 
