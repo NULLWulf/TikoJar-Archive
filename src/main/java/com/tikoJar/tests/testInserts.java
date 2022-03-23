@@ -3,9 +3,12 @@ package com.tikoJar.tests;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
+import okhttp3.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+
+import static java.util.Objects.requireNonNull;
 
 public class testInserts {
 
@@ -26,5 +29,21 @@ public class testInserts {
         messages.add(message3);
 
         Jar jar = new Jar("ABC123",openingCondition,messages);
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(Auth.getDBString()+"\"document\": " + army + "}",mediaType);
+        Request request = new Request.Builder()
+                .url("https://data.mongodb-api.com/app/data-okszo/endpoint/data/beta/action/insertOne")
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Access-Control-Request-Headers", "*")
+                .addHeader("api-key", Auth.getMongoKey())
+                .build();
+        Response response = client.newCall(request).execute();
+        JSON_Handler json = new JSON_Handler();
+        System.out.println(json.getObjAsJSONString(requireNonNull(response.body()).string()));
+        System.out.println(response.code());
+    }
     }
 }
