@@ -1,20 +1,18 @@
 package com.tikoJar.DAO;
 
-import java.time.LocalDate;
-
 public class OpeningCondition {
 
     private boolean hasMessageLimit;
     private int messageLimit;
-    private LocalDate creationDate;
-    private LocalDate openingDate;
+    private String creationDate;
+    private String openingDate;
     private String serverChannelID;
 
     public OpeningCondition(){
 
     }
 
-    public OpeningCondition(boolean hasMessageLimit, int messageLimit, LocalDate creationDate, LocalDate openingDate, String serverChannelID) {
+    public OpeningCondition(boolean hasMessageLimit, int messageLimit, String creationDate, String openingDate, String serverChannelID) {
         this.hasMessageLimit = hasMessageLimit;
         this.messageLimit = messageLimit;
         this.creationDate = creationDate;
@@ -38,19 +36,19 @@ public class OpeningCondition {
         this.messageLimit = messageLimit;
     }
 
-    public LocalDate getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
+    public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 
-    public LocalDate getOpeningDate() {
+    public String getOpeningDate() {
         return openingDate;
     }
 
-    public void setOpeningDate(LocalDate openingDate) {
+    public void setOpeningDate(String openingDate) {
         this.openingDate = openingDate;
     }
 

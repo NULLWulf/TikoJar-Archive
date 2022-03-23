@@ -1,16 +1,14 @@
 package com.tikoJar.DAO;
 
-import java.time.LocalDate;
-
 public class Message {
 
     private String userID;
-    private LocalDate datePosted;
+    private String datePosted;
     private String messageContent;
 
     public Message(){}
 
-    public Message(String userID, LocalDate datePosted, String messageContent) {
+    public Message(String userID, String datePosted, String messageContent) {
         this.userID = userID;
         this.datePosted = datePosted;
         this.messageContent = messageContent;
@@ -24,11 +22,11 @@ public class Message {
         this.userID = userID;
     }
 
-    public LocalDate getDatePosted() {
+    public String getDatePosted() {
         return datePosted;
     }
 
-    public void setDatePosted(LocalDate datePosted) {
+    public void setDatePosted(String datePosted) {
         this.datePosted = datePosted;
     }
 
