@@ -8,13 +8,15 @@ import java.time.LocalDate;
 public class QueryHandler {
 
     private MessageCreateEvent event;
+    private String serverId;
     ResponseBuilder responseBuilder;
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
+        this.serverId = event.getServer().toString();
     }
 
-    public void addMessage(){
+    public void addMessage(String message){
 
         boolean messageAdded = true;
 
