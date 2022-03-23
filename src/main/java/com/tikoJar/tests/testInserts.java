@@ -17,12 +17,8 @@ public class testInserts {
     public testInserts(){};
 
     public static void run() throws IOException {
-
-        String databaseStr = "{\"collection\":\"Jars\",\"database\":\"TikoJarTest\",\"dataSource\":\"PositivityJar\",";
         JSON_Handler json_handler = new JSON_Handler();
-
         OpeningCondition openingCondition = new OpeningCondition(true, 10, "Hi", null,"ABC123");
-
         ArrayList<Message> messages = new ArrayList<>();
 
         Message message1 = new Message("Bob", "Hi","Something positive");
@@ -31,10 +27,16 @@ public class testInserts {
 
         Jar jar = new Jar("ABC500",openingCondition,messages);
 
+        String newDBStr = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "document":%s}
+                """.formatted(json_handler.getObjAsJSONString(jar)).stripIndent();
+
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(databaseStr+"\"document\": " + json_handler.getObjAsJSONString(jar) +  "}",mediaType);
-        // json_handler.getObjAsJSONString(jar)
+        RequestBody body = RequestBody.create(newDBStr, mediaType);
         Request request = new Request.Builder()
                 .url("https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/insertOne")
                 .method("POST", body)

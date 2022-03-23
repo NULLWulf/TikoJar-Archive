@@ -70,7 +70,7 @@ public class CommandHandler {
 
                             if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
-                                queryHandler.addMessage();
+//                                queryHandler.addMessage();  // pass message content body after prefix and command
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {
