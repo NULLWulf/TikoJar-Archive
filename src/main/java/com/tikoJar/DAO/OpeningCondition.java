@@ -14,6 +14,14 @@ public class OpeningCondition {
 
     }
 
+    public OpeningCondition(boolean hasMessageLimit, int messageLimit, LocalDate creationDate, LocalDate openingDate, String serverChannelID) {
+        this.hasMessageLimit = hasMessageLimit;
+        this.messageLimit = messageLimit;
+        this.creationDate = creationDate;
+        this.openingDate = openingDate;
+        this.serverChannelID = serverChannelID;
+    }
+
     public boolean isHasMessageLimit() {
         return hasMessageLimit;
     }

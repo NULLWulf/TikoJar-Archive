@@ -1,5 +1,7 @@
 package com.tikoJar.tikoService;
 
+import com.tikoJar.DAO.Message;
+import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.Null;
