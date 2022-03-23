@@ -6,6 +6,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import java.time.LocalDate;
 
 public class QueryHandler {
+
     private MessageCreateEvent event;
     ResponseBuilder responseBuilder;
 
