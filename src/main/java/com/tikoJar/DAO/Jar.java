@@ -10,6 +10,12 @@ public class Jar {
 
     public Jar(){}
 
+    public Jar(String serverID, OpeningCondition openingCondition, ArrayList<Message> messages) {
+        this.serverID = serverID;
+        this.openingCondition = openingCondition;
+        this.messages = messages;
+    }
+
     public ArrayList<Message> getMessages() {
         return messages;
     }

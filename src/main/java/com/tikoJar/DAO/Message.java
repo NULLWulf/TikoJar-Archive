@@ -10,6 +10,12 @@ public class Message {
 
     public Message(){}
 
+    public Message(String userID, LocalDate datePosted, String messageContent) {
+        this.userID = userID;
+        this.datePosted = datePosted;
+        this.messageContent = messageContent;
+    }
+
     public String getUserID() {
         return userID;
     }
