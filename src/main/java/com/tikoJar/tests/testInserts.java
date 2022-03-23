@@ -38,7 +38,8 @@ public class testInserts {
 
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(databaseStr+"\"document\": " + json_handler.getObjAsJSONString(jar) + "}",mediaType);
+        RequestBody body = RequestBody.create(databaseStr+"\"document\": " + "Test" + "}",mediaType);
+        // json_handler.getObjAsJSONString(jar)
         Request request = new Request.Builder()
                 .url("https://data.mongodb-api.com/app/data-okszo/endpoint/data/beta/action/insertOne")
                 .method("POST", body)
