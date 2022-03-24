@@ -1,10 +1,13 @@
 package com.tikoJar.DAO;
 
+import java.lang.invoke.StringConcatFactory;
+
 public class Message {
 
     private String userID;
     private String datePosted;
     private String messageContent;
+    private String messageId;
 
     public Message(){}
 
@@ -37,4 +40,8 @@ public class Message {
     public void setMessageContent(String messageContent) {
         this.messageContent = messageContent;
     }
+
+    public String getMessageId() { return messageId;}
+
+    public void setMessageId(String messageId) { this.messageId = messageId;}
 }

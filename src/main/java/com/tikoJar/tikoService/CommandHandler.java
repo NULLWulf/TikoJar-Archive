@@ -1,7 +1,11 @@
 package com.tikoJar.tikoService;
 
+import com.tikoJar.DAO.Message;
+import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
 import com.tikoJar.tests.testInserts;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.validation.constraints.Null;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 

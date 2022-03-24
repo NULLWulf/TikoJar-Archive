@@ -38,7 +38,6 @@ public class JSON_Handler {
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(Paths.get("jsonfiles/" + objectName + ".json").toFile(),object);
     }
 
-    // Specific Function for returning army saved as JSON file
     public Jar getJarJson(String path) throws IOException {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper.readValue(new File(path), Jar.class);
