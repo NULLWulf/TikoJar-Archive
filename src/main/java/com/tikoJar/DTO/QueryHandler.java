@@ -1,15 +1,22 @@
 package com.tikoJar.DTO;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Message;
+import com.tikoJar.DAO.MessageJar;
 import com.tikoJar.tests.JSON_Handler;
 import jakarta.json.JsonObject;
 import okhttp3.*;
+import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class QueryHandler {
@@ -70,6 +77,8 @@ public class QueryHandler {
 
             processQuery(addMessageQuery,ENDPT.UPDATE.get());
             responseBuilder.addMessageResponse(true);
+
+
 
         }else{
 
@@ -140,34 +149,53 @@ public class QueryHandler {
 
     }
 
-    public void viewMessages(boolean isAdmin){
+    public void viewMessages(boolean isAdmin) throws IOException {
 
-        boolean hasJar = true;
+        if(checkIfJarExists()){
 
-        // TODO: verify that server has a jar
-        // TODO: else, hasJar = false
+            String viewMessagesQuery = """
+                        {
+                            "collection":"Jars",
+                            "database":"TikoJarTest",
+                            "dataSource":"PositivityJar",
+                            "filter": { "serverID": "ABC123" },
+                            "projection": {"messages": 1, "_id": 0 }
+                        }
+                    """.stripIndent();
 
-        if(hasJar){
+            processQuery(viewMessagesQuery,ENDPT.FIND.get());
+            String messages = Objects.requireNonNull(response.body()).string(); // can only call string once so need to store in string
+            String toParse = StringUtils.substring(messages,12, messages.length() - 1);
+            System.out.println(toParse);
 
-            if(isAdmin){
-
-                // TODO: query all messages for jar
-
-            } else {
-
-                // TODO: query only the user's messages for jar
-
-            }
-
-            // TODO: instantiate responseBuilder with response object
-
-        } else {
-
-            responseBuilder = new ResponseBuilder(null, event);
+        }else{
 
         }
 
-        responseBuilder.viewMessagesResponse();
+//        // TODO: verify that server has a jar
+//        // TODO: else, hasJar = false
+//
+//        if(hasJar){
+//
+//            if(isAdmin){
+//
+//                // TODO: query all messages for jar
+//
+//            } else {
+//
+//                // TODO: query only the user's messages for jar
+//
+//            }
+//
+//            // TODO: instantiate responseBuilder with response object
+//
+//        } else {
+//
+//            responseBuilder = new ResponseBuilder(null, event);
+//
+//        }
+//
+//        responseBuilder.viewMessagesResponse();
     }
 
     public void deleteMessage(boolean includedMessageID, String messageID){

@@ -1,6 +1,7 @@
 package com.tikoJar.DAO;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Jar extends MessageJar {
 
@@ -10,11 +11,11 @@ public class Jar extends MessageJar {
 
     public Jar(){}
 
-    public Jar(Long serverID, String serverName, OpeningCondition openingCondition, ArrayList<Message> messages) {
+    public Jar(Long serverID, String serverName, OpeningCondition openingCondition, List<Message> message) {
         this.serverName = serverName;
         this.serverID = serverID;
         this.openingCondition = openingCondition;
-        super.setMessages(messages);
+        super.setMessage(message);
     }
 
     public String getServerName() {return serverName;}

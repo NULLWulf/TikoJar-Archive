@@ -165,7 +165,11 @@ public class CommandHandler {
 
                                 } else {
 
-                                    queryHandler.viewMessages(isAdmin);
+                                    try {
+                                        queryHandler.viewMessages(isAdmin);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
 
                                 }
 
