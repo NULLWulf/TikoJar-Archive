@@ -1,5 +1,8 @@
 package com.tikoJar.DTO;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.tikoJar.DAO.Message;
+import com.tikoJar.tests.JSON_Handler;
 import jakarta.json.JsonObject;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -10,37 +13,53 @@ public class QueryHandler {
     private MessageCreateEvent event;
     private String serverId;
     ResponseBuilder responseBuilder;
+    JSON_Handler jsonHelper;
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
         this.serverId = event.getServer().toString();
     }
 
-    public void addMessage(String message){
+    public void addMessage(String message) throws JsonProcessingException {
 
-        boolean messageAdded = false;
+        JSON_Handler json = new JSON_Handler();
+        Message newMessage = new Message(event.getMessageAuthor().toString(), message);
 
-        // TODO: if server has jar, store the message in it.
-        // TODO: else, messageAdded = false
+        json.displayObjectAsJson(newMessage);
 
-        this.responseBuilder = new ResponseBuilder(null, event);
+        String addMessageQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" },
+                "update": {
+                    "$push": { 
+                    "messages": %s}}}
+                """.formatted(serverId, json.getObjAsJSONString(newMessage)).stripIndent();
 
-        responseBuilder.addMessageResponse(messageAdded);
-
-        if(messageAdded){
-
-            if(checkMessageLimit()){
-
-                // TODO: retrieve jar from database
-
-                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
-
-                responseBuilder.messageLimitEvent();
-
-                // TODO: delete server's jar
-
-            }
-        }
+//        boolean messageAdded = false;
+//
+//        // TODO: if server has jar, store the message in it.
+//        // TODO: else, messageAdded = false
+//
+//        this.responseBuilder = new ResponseBuilder(null, event);
+//
+//        responseBuilder.addMessageResponse(messageAdded);
+//
+//        if(messageAdded){
+//
+//            if(checkMessageLimit()){
+//
+//                // TODO: retrieve jar from database
+//
+//                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
+//
+//                responseBuilder.messageLimitEvent();
+//
+//                // TODO: delete server's jar
+//
+//            }
+//        }
 
     }
 

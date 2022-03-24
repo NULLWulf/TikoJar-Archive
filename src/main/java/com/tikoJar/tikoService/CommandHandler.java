@@ -1,5 +1,6 @@
 package com.tikoJar.tikoService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
@@ -40,6 +41,10 @@ public class CommandHandler {
     }
 
     public static void main(String[] args) throws IOException {
+
+        testInserts testInserts = new testInserts();
+
+        testInserts.testAddMessage("ABC123","Nathan","This is a message body");
 
         String token = TokenHandler.TOKEN;
 
@@ -83,7 +88,11 @@ public class CommandHandler {
 
                                 }
 
-                                queryHandler.addMessage(message.toString());
+                                try {
+                                    queryHandler.addMessage(message.toString());
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {
