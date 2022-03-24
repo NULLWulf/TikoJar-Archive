@@ -43,6 +43,7 @@ public class CommandHandler {
         testInserts test = new testInserts();
         testInserts.run();
 
+
         String token = TokenHandler.TOKEN;
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
