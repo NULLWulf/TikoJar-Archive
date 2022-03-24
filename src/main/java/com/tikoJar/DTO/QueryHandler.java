@@ -158,15 +158,16 @@ public class QueryHandler {
                             "collection":"Jars",
                             "database":"TikoJarTest",
                             "dataSource":"PositivityJar",
-                            "filter": { "serverID": "ABC123" },
-                            "projection": {"messages": 1, "_id": 0 }
+                            "filter": { "serverID": "ABC123" }
                         }
                     """.stripIndent();
 
             processQuery(viewMessagesQuery,ENDPT.FIND.get());
             String messages = Objects.requireNonNull(response.body()).string(); // can only call string once so need to store in string
-            String toParse = StringUtils.substring(messages,12, messages.length() - 1);
+            String toParse = StringUtils.substring(messages,12, messages.length() - 1);  // removes Document enclosure
             System.out.println(toParse);
+            ObjectMapper mapper = new ObjectMapper();
+            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
 
         }else{
 
