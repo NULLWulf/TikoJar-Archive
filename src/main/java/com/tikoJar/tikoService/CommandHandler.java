@@ -4,10 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
-import com.tikoJar.tests.JSON_Handler;
-import com.tikoJar.tests.testInserts;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.validation.constraints.Null;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
@@ -47,6 +43,7 @@ public class CommandHandler {
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
 
+        new TimedEventHandler();
 
         api.addMessageCreateListener(event -> {
 
