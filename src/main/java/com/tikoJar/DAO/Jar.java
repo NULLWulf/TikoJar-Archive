@@ -11,7 +11,7 @@ public class Jar {
     private String serverName;
     private OpeningCondition openingCondition;
 
-    @JsonProperty("messages")
+    @JsonProperty("Messages")
     private List<Message> message;
 
     public Jar(){}
