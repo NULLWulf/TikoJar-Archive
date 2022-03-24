@@ -12,6 +12,10 @@ public class ResponseBuilder {
     private final MessageCreateEvent event;
     private Jar jar;
 
+    public ResponseBuilder(MessageCreateEvent event){
+        this.event = event;
+    };
+
     public ResponseBuilder(JsonObject responseObject, MessageCreateEvent event){
 
         this.event = event;

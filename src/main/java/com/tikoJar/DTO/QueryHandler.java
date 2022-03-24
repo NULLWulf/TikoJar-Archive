@@ -45,16 +45,20 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> System.out.println("Error retrieving Server ID from Javacord API")
         );
-        System.out.println(serverName);
-        System.out.println(serverId);
+        System.out.println("Server Name:" + serverName);
+        System.out.println("Server Id:" + serverId);
     }
 
     public void addMessage(String message) throws IOException {
 
-        jsonHelper = new JSON_Handler();
-        Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);
+        responseBuilder = new ResponseBuilder(event);
 
-        String addMessageQuery = """
+        if(checkIfJarExists()){
+
+            jsonHelper = new JSON_Handler();
+            Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);
+
+            String addMessageQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
@@ -64,9 +68,14 @@ public class QueryHandler {
                     "messages": %s}}}
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();
 
-        processQuery(addMessageQuery,"updateOne");
+            processQuery(addMessageQuery,ENDPT.UPDATE.get());
+            responseBuilder.addMessageResponse(true);
 
-        System.out.println(response.code());
+        }else{
+
+            responseBuilder.addMessageResponse(false);
+
+        }
 
 //        boolean messageAdded = false;
 //
@@ -254,6 +263,26 @@ public class QueryHandler {
                 .build();
 
         response = client.newCall(request).execute();
+
+    }
+
+    public Boolean checkIfJarExists() throws IOException {
+
+        String checkJarExistsQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}
+                """.formatted(serverId);
+
+        processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+
+        return response.code() == 200;
+
+    }
+
+    public void checkResponseCode(){
+        int responseCode = response.code();
 
     }
 
