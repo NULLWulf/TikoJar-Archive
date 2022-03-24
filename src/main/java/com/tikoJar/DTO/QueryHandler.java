@@ -283,7 +283,6 @@ public class QueryHandler {
 
     public void checkResponseCode(){
         int responseCode = response.code();
-
     }
 
 }
