@@ -1,13 +1,17 @@
 package com.tikoJar.DAO;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
-public class Jar extends MessageJar {
+public class Jar {
 
     private Long serverID;
     private String serverName;
     private OpeningCondition openingCondition;
+
+    @JsonProperty("messages")
+    private List<Message> message;
 
     public Jar(){}
 
@@ -15,7 +19,7 @@ public class Jar extends MessageJar {
         this.serverName = serverName;
         this.serverID = serverID;
         this.openingCondition = openingCondition;
-        super.setMessage(message);
+        this.message = message;
     }
 
     public String getServerName() {return serverName;}
@@ -36,5 +40,13 @@ public class Jar extends MessageJar {
 
     public void setOpeningCondition(OpeningCondition openingCondition) {
         this.openingCondition = openingCondition;
+    }
+
+    public List<Message> getMessage() {
+        return message;
+    }
+
+    public void setMessage(List<Message> person) {
+        this.message = person;
     }
 }

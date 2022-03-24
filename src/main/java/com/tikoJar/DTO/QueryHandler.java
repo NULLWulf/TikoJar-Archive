@@ -1,23 +1,16 @@
 package com.tikoJar.DTO;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Message;
-import com.tikoJar.DAO.MessageJar;
 import com.tikoJar.tests.JSON_Handler;
-import jakarta.json.JsonObject;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class QueryHandler {
 
@@ -77,8 +70,6 @@ public class QueryHandler {
 
             processQuery(addMessageQuery,ENDPT.UPDATE.get());
             responseBuilder.addMessageResponse(true);
-
-
 
         }else{
 
