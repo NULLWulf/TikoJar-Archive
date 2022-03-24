@@ -21,9 +21,9 @@ public class testInserts {
         OpeningCondition openingCondition = new OpeningCondition(true, 10, "Hi", null,"ABC123");
         ArrayList<Message> messages = new ArrayList<>();
 
-        Message message1 = new Message("Bob", "Hi","Something positive");
-        Message message2 = new Message("Samander", "Hi","Something positive again");
-        Message message3 = new Message("Jake", "Hi","Something negative");
+//        Message message1 = new Message("Bob", "Hi","Something positive");
+//        Message message2 = new Message("Samander", "Hi","Something positive again");
+//        Message message3 = new Message("Jake", "Hi","Something negative");
 
         Jar jar = new Jar("ABC500",openingCondition,messages);
 

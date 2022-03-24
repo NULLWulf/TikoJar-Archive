@@ -3,6 +3,7 @@ package com.tikoJar.tikoService;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
+import com.tikoJar.tests.JSON_Handler;
 import com.tikoJar.tests.testInserts;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.Null;
@@ -40,8 +41,13 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
-        testInserts test = new testInserts();
-        testInserts.run();
+//        testInserts test = new testInserts();
+//        testInserts.run();
+
+        Message message = new Message("Bobbis", "smack yo bitch up");
+        JSON_Handler jhelper = new JSON_Handler();
+
+
 
 
         String token = TokenHandler.TOKEN;

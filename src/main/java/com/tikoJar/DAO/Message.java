@@ -15,7 +15,7 @@ public class Message {
 
     public Message(){}
 
-    public Message(String userID, String datePosted, String messageContent) {
+    public Message(String userID, String messageContent) {
         this.userID = userID;
         this.datePosted = LocalDate.now().toString();
         this.messageContent = messageContent;

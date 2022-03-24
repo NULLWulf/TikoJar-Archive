@@ -15,8 +15,6 @@ public class Jar extends MessageJar {
         super.setMessages(messages);
     }
 
-
-
     public String getServerID() {
         return serverID;
     }
