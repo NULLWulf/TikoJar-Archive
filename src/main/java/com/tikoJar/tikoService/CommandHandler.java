@@ -41,13 +41,6 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
-//        testInserts test = new testInserts();
-//        testInserts.run();
-
-        Message message = new Message("Bobbis", "smack yo bitch up");
-        JSON_Handler jhelper = new JSON_Handler();
-        jhelper.displayObjectAsJson(message);
-
         String token = TokenHandler.TOKEN;
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
