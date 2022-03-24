@@ -3,12 +3,14 @@ package com.tikoJar.tikoService;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
+import com.tikoJar.tests.JSON_Handler;
+import com.tikoJar.tests.testInserts;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.Null;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
-import java.util.StringTokenizer;
+import java.io.IOException;
 
 public class CommandHandler {
 
@@ -37,7 +39,7 @@ public class CommandHandler {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         String token = TokenHandler.TOKEN;
 
@@ -66,7 +68,7 @@ public class CommandHandler {
 
                             if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
-                                queryHandler.addMessage();
+//                                queryHandler.addMessage();  // pass message content body after prefix and command
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {

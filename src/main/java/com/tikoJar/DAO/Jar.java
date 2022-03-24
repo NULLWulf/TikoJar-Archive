@@ -2,26 +2,17 @@ package com.tikoJar.DAO;
 
 import java.util.ArrayList;
 
-public class Jar {
+public class Jar extends MessageJar {
 
     private String serverID;
     private OpeningCondition openingCondition;
-    private ArrayList<Message> messages;
 
     public Jar(){}
 
     public Jar(String serverID, OpeningCondition openingCondition, ArrayList<Message> messages) {
         this.serverID = serverID;
         this.openingCondition = openingCondition;
-        this.messages = messages;
-    }
-
-    public ArrayList<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(ArrayList<Message> messages) {
-        this.messages = messages;
+        super.setMessages(messages);
     }
 
     public String getServerID() {

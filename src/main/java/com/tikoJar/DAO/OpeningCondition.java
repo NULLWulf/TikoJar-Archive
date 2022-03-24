@@ -6,19 +6,19 @@ public class OpeningCondition {
 
     private boolean hasMessageLimit;
     private int messageLimit;
-    private LocalDate creationDate;
-    private LocalDate openingDate;
+    private String creationDate;
+    private String openingDate;
     private String serverChannelID;
 
     public OpeningCondition(){
 
     }
 
-    public OpeningCondition(boolean hasMessageLimit, int messageLimit, LocalDate creationDate, LocalDate openingDate, String serverChannelID) {
+    public OpeningCondition(boolean hasMessageLimit, int messageLimit, int timeLimitInDays, String serverChannelID) {
         this.hasMessageLimit = hasMessageLimit;
         this.messageLimit = messageLimit;
-        this.creationDate = creationDate;
-        this.openingDate = openingDate;
+        this.creationDate = LocalDate.now().toString();;
+        this.openingDate = LocalDate.now().plusDays(timeLimitInDays).toString();
         this.serverChannelID = serverChannelID;
     }
 
@@ -38,19 +38,19 @@ public class OpeningCondition {
         this.messageLimit = messageLimit;
     }
 
-    public LocalDate getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
+    public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 
-    public LocalDate getOpeningDate() {
+    public String getOpeningDate() {
         return openingDate;
     }
 
-    public void setOpeningDate(LocalDate openingDate) {
+    public void setOpeningDate(String openingDate) {
         this.openingDate = openingDate;
     }
 
