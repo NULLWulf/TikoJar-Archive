@@ -4,28 +4,55 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
 import jakarta.json.JsonObject;
+import okhttp3.*;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class QueryHandler {
 
     private MessageCreateEvent event;
-    private String serverId;
+
+    private Long serverId;  // serverID are Long data types
+    private String serverName; // serverNames are string
+
     ResponseBuilder responseBuilder;
+
+    // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
+
+    // OKHTTP3 Library Objects, they are initliazed in the process query function
+    // but declared within the class for each query method to access relevant data
+    OkHttpClient client;
+    MediaType mediaType;
+    RequestBody body;
+    Request request;
+    Response response;
+
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
-        this.serverId = event.getServer().toString();
+
+        // Anytime query handler called, since it is within the context of
+        // an individual discord server, constructors retrieves serverId and
+        // and serverName, may change, in actuality serverId may be all that is required here
+        event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
+                () -> System.out.println("Error retrieving Server name")
+        );
+        event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
+                () -> System.out.println("Error retrieving Server ID from Javacord API")
+        );
+        System.out.println(serverName);
+        System.out.println(serverId);
     }
 
-    public void addMessage(String message) throws JsonProcessingException {
+    public void addMessage(String message) throws IOException {
 
-        JSON_Handler json = new JSON_Handler();
-        Message newMessage = new Message(event.getMessageAuthor().toString(), message);
-
-        json.displayObjectAsJson(newMessage);
+        jsonHelper = new JSON_Handler();
+        Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);
 
         String addMessageQuery = """
                 {"collection":"Jars",
@@ -35,7 +62,11 @@ public class QueryHandler {
                 "update": {
                     "$push": { 
                     "messages": %s}}}
-                """.formatted(serverId, json.getObjAsJSONString(newMessage)).stripIndent();
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();
+
+        processQuery(addMessageQuery,"updateOne");
+
+        System.out.println(response.code());
 
 //        boolean messageAdded = false;
 //
@@ -206,6 +237,23 @@ public class QueryHandler {
         // TODO: instantiate responseBuilder with response object
 
         this.responseBuilder.timeLimitEvent();
+
+    }
+
+    public void processQuery(String query, String endPoint) throws IOException {
+
+        client = new OkHttpClient().newBuilder().build();
+        mediaType = MediaType.parse("application/json");
+        body = RequestBody.create(query, mediaType);
+        request = new Request.Builder()
+                .url("https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint))
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Access-Control-Request-Headers", "*")
+                .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
+                .build();
+
+        response = client.newCall(request).execute();
 
     }
 

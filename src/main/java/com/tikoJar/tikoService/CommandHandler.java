@@ -42,13 +42,11 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
-        testInserts testInserts = new testInserts();
-
-        testInserts.testAddMessage("ABC123","Nathan","This is a message body");
 
         String token = TokenHandler.TOKEN;
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
+
 
         api.addMessageCreateListener(event -> {
 
@@ -90,7 +88,7 @@ public class CommandHandler {
 
                                 try {
                                     queryHandler.addMessage(message.toString());
-                                } catch (JsonProcessingException e) {
+                                } catch (IOException e) {
                                     e.printStackTrace();
                                 }
 

@@ -4,22 +4,28 @@ import java.util.ArrayList;
 
 public class Jar extends MessageJar {
 
-    private String serverID;
+    private Long serverID;
+    private String serverName;
     private OpeningCondition openingCondition;
 
     public Jar(){}
 
-    public Jar(String serverID, OpeningCondition openingCondition, ArrayList<Message> messages) {
+    public Jar(Long serverID, String serverName, OpeningCondition openingCondition, ArrayList<Message> messages) {
+        this.serverName = serverName;
         this.serverID = serverID;
         this.openingCondition = openingCondition;
         super.setMessages(messages);
     }
 
-    public String getServerID() {
+    public String getServerName() {return serverName;}
+
+    public void setServerName(String serverName) {this.serverName = serverName;}
+
+    public Long getServerID() {
         return serverID;
     }
 
-    public void setServerID(String serverID) {
+    public void setServerID(Long serverID) {
         this.serverID = serverID;
     }
 
