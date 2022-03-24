@@ -10,9 +10,7 @@ public class OpeningCondition {
     private String openingDate;
     private String serverChannelID;
 
-    public OpeningCondition(){
-
-    }
+    public OpeningCondition(){}
 
     public OpeningCondition(boolean hasMessageLimit, int messageLimit, int timeLimitInDays, String serverChannelID) {
         this.hasMessageLimit = hasMessageLimit;
