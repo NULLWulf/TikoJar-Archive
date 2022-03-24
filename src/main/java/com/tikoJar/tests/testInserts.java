@@ -17,15 +17,14 @@ public class testInserts {
     public testInserts(){};
 
     public static void run() throws IOException {
-        JSON_Handler json_handler = new JSON_Handler();
-        OpeningCondition openingCondition = new OpeningCondition(true, 10, "Hi", null,"ABC123");
-        ArrayList<Message> messages = new ArrayList<>();
-
-//        Message message1 = new Message("Bob", "Hi","Something positive");
-//        Message message2 = new Message("Samander", "Hi","Something positive again");
-//        Message message3 = new Message("Jake", "Hi","Something negative");
-
-        Jar jar = new Jar("ABC500",openingCondition,messages);
+//        JSON_Handler json_handler = new JSON_Handler();
+//        ArrayList<Message> messages = new ArrayList<>();
+//
+////        Message message1 = new Message("Bob", "Hi","Something positive");
+////        Message message2 = new Message("Samander", "Hi","Something positive again");
+////        Message message3 = new Message("Jake", "Hi","Something negative");
+//
+//        Jar jar = new Jar("ABC500",openingCondition,messages);
 
         String newDBStr = """
                 {"collection":"Jars",

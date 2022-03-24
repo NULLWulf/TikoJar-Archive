@@ -20,10 +20,6 @@ public class QueryHandler {
 
         boolean messageAdded = false;
 
-
-
-
-
         // TODO: if server has jar, store the message in it.
         // TODO: else, messageAdded = false
 

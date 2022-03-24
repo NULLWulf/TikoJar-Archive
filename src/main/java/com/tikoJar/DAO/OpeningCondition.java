@@ -1,5 +1,7 @@
 package com.tikoJar.DAO;
 
+import java.time.LocalDate;
+
 public class OpeningCondition {
 
     private boolean hasMessageLimit;
@@ -12,11 +14,11 @@ public class OpeningCondition {
 
     }
 
-    public OpeningCondition(boolean hasMessageLimit, int messageLimit, String creationDate, String openingDate, String serverChannelID) {
+    public OpeningCondition(boolean hasMessageLimit, int messageLimit, int timeLimitInDays, String serverChannelID) {
         this.hasMessageLimit = hasMessageLimit;
         this.messageLimit = messageLimit;
-        this.creationDate = creationDate;
-        this.openingDate = openingDate;
+        this.creationDate = LocalDate.now().toString();;
+        this.openingDate = LocalDate.now().plusDays(timeLimitInDays).toString();
         this.serverChannelID = serverChannelID;
     }
 

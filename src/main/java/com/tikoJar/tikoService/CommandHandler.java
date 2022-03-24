@@ -46,9 +46,7 @@ public class CommandHandler {
 
         Message message = new Message("Bobbis", "smack yo bitch up");
         JSON_Handler jhelper = new JSON_Handler();
-
-
-
+        jhelper.displayObjectAsJson(message);
 
         String token = TokenHandler.TOKEN;
 
