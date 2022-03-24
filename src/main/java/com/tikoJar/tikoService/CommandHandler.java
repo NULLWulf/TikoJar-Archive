@@ -68,7 +68,22 @@ public class CommandHandler {
 
                             if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
-//                                queryHandler.addMessage();  // pass message content body after prefix and command
+                                StringBuilder message = new StringBuilder();
+
+                                message.append(messageContent[2]);
+
+                                if (messageContent.length > 3){
+
+                                    for (int i = 2; i < messageContent.length; i++){
+
+                                        message.append(" ");
+                                        message.append(messageContent[i]);
+
+                                    }
+
+                                }
+
+                                queryHandler.addMessage(message.toString());
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {
