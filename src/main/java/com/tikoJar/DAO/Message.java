@@ -1,6 +1,10 @@
 package com.tikoJar.DAO;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import java.lang.invoke.StringConcatFactory;
+import java.time.LocalDate;
+import java.util.concurrent.BlockingDeque;
 
 public class Message {
 
@@ -13,8 +17,9 @@ public class Message {
 
     public Message(String userID, String datePosted, String messageContent) {
         this.userID = userID;
-        this.datePosted = datePosted;
+        this.datePosted = LocalDate.now().toString();
         this.messageContent = messageContent;
+        generateMessageId();
     }
 
     public String getUserID() {
@@ -44,4 +49,8 @@ public class Message {
     public String getMessageId() { return messageId;}
 
     public void setMessageId(String messageId) { this.messageId = messageId;}
+
+    public void generateMessageId(){
+        this.messageId = RandomStringUtils.randomAlphanumeric(10);
+    }
 }
