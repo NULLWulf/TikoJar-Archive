@@ -10,7 +10,6 @@ Nathan Wolf -
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
-import kotlin._Assertions;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -67,7 +66,7 @@ public class QueryHandler {
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
-                pullJar()
+                pullJar();
             }
             else{
                 responseBuilder.addMessageResponse(false);
@@ -100,6 +99,9 @@ public class QueryHandler {
 //            }
 //        }
 
+    }
+
+    private void pullJar() {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays){
