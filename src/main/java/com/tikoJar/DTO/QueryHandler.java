@@ -118,28 +118,28 @@ public class QueryHandler {
     }
 
     public void viewMessages(boolean isAdmin) throws IOException {
-
-        if(checkIfJarExists()){
-
-            String viewMessagesQuery = """
-                        {
-                            "collection":"Jars",
-                            "database":"TikoJarTest",
-                            "dataSource":"PositivityJar",
-                            "filter": { "serverID": "ABC123" }
-                        }
-                    """.stripIndent();
-
-            processQuery(viewMessagesQuery,ENDPT.FIND.get());
-             // can only call string once so need to store in string
-            String toParse = stripDocument(postResponseBody);
-            System.out.println(toParse);
-            ObjectMapper mapper = new ObjectMapper();
-            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
-
-        }else{
-
-        }
+//
+//        if(checkIfJarExists()){
+//
+//            String viewMessagesQuery = """
+//                        {
+//                            "collection":"Jars",
+//                            "database":"TikoJarTest",
+//                            "dataSource":"PositivityJar",
+//                            "filter": { "serverID": "ABC123" }
+//                        }
+//                    """.stripIndent();
+//
+//            processQuery(viewMessagesQuery,ENDPT.FIND.get());
+//             // can only call string once so need to store in string
+//            String toParse = stripDocument(postResponseBody);
+//            System.out.println(toParse);
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
+//
+//        }else{
+//
+//        }
 
 //        // TODO: verify that server has a jar
 //        // TODO: else, hasJar = false
@@ -165,7 +165,7 @@ public class QueryHandler {
 //        }
 //
 //        responseBuilder.viewMessagesResponse();
-    } // WIP
+    }
 
     public void deleteMessage(boolean includedMessageID, String messageID){
 
@@ -202,8 +202,6 @@ public class QueryHandler {
     }
 
     public boolean checkMessageLimit(){
-
-
 
         boolean messageLimitReached = false;
 

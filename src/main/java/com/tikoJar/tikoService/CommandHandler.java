@@ -38,7 +38,6 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
-
         String token = TokenHandler.TOKEN;
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
