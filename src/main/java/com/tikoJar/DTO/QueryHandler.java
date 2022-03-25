@@ -83,15 +83,13 @@ public class QueryHandler {
     private void pullJar() {
     }
 
-    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays){
-
-        boolean hasJar = false;
+    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays) throws IOException {
 
         if(validSyntax && isAdmin){
 
             // TODO: check if server has jar. If it does, set hasJar to true.
 
-            if (!hasJar){
+            if (!checkIfJarExists()){
 
                 if (messageLimit != 0){
 
@@ -110,13 +108,12 @@ public class QueryHandler {
 
                 }
 
+            }else{
+                responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
-
+        }else{
+            responseBuilder.createJarResponse(validSyntax, isAdmin, false);
         }
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.createJarResponse(validSyntax, isAdmin, hasJar);
 
     }
 
