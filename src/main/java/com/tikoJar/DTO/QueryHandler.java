@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
+import java.lang.invoke.StringConcatFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -302,7 +303,15 @@ public class QueryHandler {
     }
 
     public void checkResponseCode(){
-        int responseCode = response.code();
+
+        String result = switch (response.code()){
+            case 200 -> "Successfully found";
+            case 201 -> "New Entity Created";
+            case 400 -> "Bad Syntax in Request";
+            case 401 -> "Unauthorized request, check API keys";
+            default -> throw new IllegalStateException("Unexpected value: " + response.code());
+        };
+
     }
 
 }
