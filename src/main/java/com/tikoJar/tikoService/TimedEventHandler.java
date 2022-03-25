@@ -14,7 +14,7 @@ public class TimedEventHandler {
         // Set QueryHandler.checkTimeLimits() to run repeatedly on a schedule
         TimerTask repeatedTask = new TimerTask() {
             public void run() {
-                QueryHandler.checkTimeLimits();
+//                QueryHandler.checkTimeLimits();
             }
         };
 
