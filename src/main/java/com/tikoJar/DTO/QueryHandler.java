@@ -63,8 +63,12 @@ public class QueryHandler {
     public void addMessage(String message) throws IOException {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            if(checkIfMessageAdded(new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
+            if(checkIfMessageAdded(
+                    new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
             responseBuilder.addMessageResponse(true);  // Calls message added true response
+            if(checkMessageLimit()){
+                pullJar()
+            }
             else{
                 responseBuilder.addMessageResponse(false);
             }
