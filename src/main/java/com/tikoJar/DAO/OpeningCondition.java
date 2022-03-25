@@ -1,7 +1,10 @@
 package com.tikoJar.DAO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.time.LocalDate;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OpeningCondition {
 
     private boolean hasMessageLimit;

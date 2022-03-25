@@ -3,11 +3,12 @@ package com.tikoJar.DTO;
 
 /*
 Authors (by Function)
-Nathan Wolf -
+Nathan Wolf - QueryHandler Constructors,
 
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
@@ -42,7 +43,6 @@ public class QueryHandler {
     String postResponseBody;
     int responseCode;
 
-
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
 
@@ -66,7 +66,6 @@ public class QueryHandler {
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
-                pullJar();
             }
             else{
                 responseBuilder.addMessageResponse(false);
@@ -75,29 +74,9 @@ public class QueryHandler {
             responseBuilder.jarExistsResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
-//        boolean messageAdded = false;
-//
-//        // TODO: if server has jar, store the message in it.
-//        // TODO: else, messageAdded = false
-//
-//        this.responseBuilder = new ResponseBuilder(null, event);
-//
-//        responseBuilder.addMessageResponse(messageAdded);
-//
-//        if(messageAdded){
-//
-//            if(checkMessageLimit()){
-//
-//                // TODO: retrieve jar from database
 //
 //                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
-//
-//                responseBuilder.messageLimitEvent();
-//
-//                // TODO: delete server's jar
-//
-//            }
-//        }
+          // TODO: delete server's jar
 
     }
 
@@ -189,7 +168,7 @@ public class QueryHandler {
 //        }
 //
 //        responseBuilder.viewMessagesResponse();
-    }
+    } // WIP
 
     public void deleteMessage(boolean includedMessageID, String messageID){
 
@@ -225,8 +204,9 @@ public class QueryHandler {
 
     }
 
-
     public boolean checkMessageLimit(){
+
+
 
         boolean messageLimitReached = false;
 
@@ -301,6 +281,21 @@ public class QueryHandler {
         // this formats that string representative in a way of how it's inserted into the database thus deserilaization
         // should be easier
         return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
+    }
+
+    public void createJar(Jar jar) throws IOException {
+
+        String createJarQuery = """
+                {
+                    "collection":"Jars",
+                    "database":"TikoJarTest",
+                    "dataSource":"PositivityJar",
+                    "filter": { "serverID": "%s" },
+                    "document": %s
+                }
+                """.formatted(serverId, jar).stripIndent();
+
+        processQuery(createJarQuery,ENDPT.INSERT.get());
     }
 
     public void getHelp(){
