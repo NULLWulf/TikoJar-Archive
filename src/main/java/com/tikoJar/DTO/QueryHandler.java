@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class QueryHandler {
 
@@ -55,20 +56,34 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> System.out.println("Error retrieving Server ID from Javacord API")
         );
-        System.out.println("Server Name:" + serverName);
-        System.out.println("Server Id:" + serverId);
+        System.out.printf("""
+                    Initializing QueryHandler for
+                    %s : %s
+                    """, serverName, serverId);
+
     }
 
     public void addMessage(String message) throws IOException {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
+            System.out.printf("""
+                    Jar Exists for Server: %s : %s
+                    Checking if Message Added...
+                    """, serverName, serverId);
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
+                System.out.printf("""
+                    Message Added for: %s : %s
+                    Checking if Message Added...
+                    """, serverName, serverId);
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
 
             }
         }else{
+            System.out.printf("""
+                    Message not Added for
+                    """, serverName, serverId);
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
@@ -225,8 +240,9 @@ public class QueryHandler {
         client = new OkHttpClient().newBuilder().build();
         mediaType = MediaType.parse("application/json");
         body = RequestBody.create(query, mediaType);
+        String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
         request = new Request.Builder()
-                .url("https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint))
+                .url(url)
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Access-Control-Request-Headers", "*")
@@ -239,6 +255,18 @@ public class QueryHandler {
 
         response.close();  // Close the client
 
+        System.out.printf("""
+        
+        ----HTTP Request Results----:
+            ::  Sent Query ::
+        %s
+            ::     URL     ::
+        %s
+            ::  Response   ::
+        Status Code: %d
+        Response Body:
+        %s
+        """, query,url,responseCode,postResponseBody);
     }
 
     public Boolean checkIfJarExists() throws IOException {
@@ -251,7 +279,11 @@ public class QueryHandler {
                 """.formatted(serverId);
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        return responseCode == 200;
+        if (responseCode == 200){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
@@ -268,6 +300,7 @@ public class QueryHandler {
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
         return responseCode == 201;
+
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
@@ -314,6 +347,7 @@ public class QueryHandler {
         responseBuilder.invalidCommandResponse();
 
     }
+
 }
 
 
