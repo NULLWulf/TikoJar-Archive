@@ -16,7 +16,7 @@ public class ResponseBuilder {
 
     public ResponseBuilder(MessageCreateEvent event){
         this.event = event;
-    };
+    }
 
     public ResponseBuilder(JsonObject responseObject, MessageCreateEvent event){
 

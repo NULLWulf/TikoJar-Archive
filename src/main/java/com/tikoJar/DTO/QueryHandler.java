@@ -1,13 +1,13 @@
 package com.tikoJar.DTO;
-
-
 /*
 Authors (by Function)
-Nathan Wolf - QueryHandler Constructors,
+Nathan Wolf - QueryHandler Constructors, addMessage, viewMessage, checkMessageLimits
+    - checkIfJarExists, checkIfMessageAdded, pullJar, processQuery, stripJar, createJarQuery
+Joel Santos - createJar, checkTimeLimits, deleteMessage, deleteJar
+Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
@@ -16,13 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 public class QueryHandler {
 
-    private MessageCreateEvent event;
+    private final MessageCreateEvent event;
 
     private Long serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
@@ -32,7 +30,7 @@ public class QueryHandler {
     // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
 
-    // OKHTTP3 Library Objects, they are initliazed in the process query function
+    // OKHTTP3 Library Objects, they are initialized in the process query function
     // but declared within the class for each query method to access relevant data
     OkHttpClient client;
     MediaType mediaType;
@@ -40,6 +38,7 @@ public class QueryHandler {
     Request request;
     Response response;
 
+    // Stores variables from response from HTTP client, client is closed after call so values in Response are volatile
     String postResponseBody;
     int responseCode;
 
@@ -47,7 +46,7 @@ public class QueryHandler {
         this.event = event;
 
         // Anytime query handler called, since it is within the context of
-        // an individual discord server, constructors retrieves serverId and
+        // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
                 () -> System.out.println("Error retrieving Server name")
@@ -55,26 +54,36 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
                 () -> System.out.println("Error retrieving Server ID from Javacord API")
         );
-        System.out.println("Server Name:" + serverName);
-        System.out.println("Server Id:" + serverId);
+        System.out.printf("""
+                    Initializing QueryHandler for
+                    %s : %s
+                    """, serverName, serverId);
     }
 
     public void addMessage(String message) throws IOException {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
+            System.out.printf("""
+                    Jar Exists for Server: %s : %s
+                    Checking if Message Added...
+                    """, serverName, serverId);
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
+                System.out.printf("""
+                    Message Added for: %s : %s
+                    Checking if Message Added...
+                    """, serverName, serverId);
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
 
             }
         }else{
+            System.out.printf("""
+                    Message not Added for
+                    %s : %s
+                    """, serverName, serverId);
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
-
-//
-//                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
-          // TODO: delete server's jar
 
     }
 
@@ -129,8 +138,7 @@ public class QueryHandler {
 //                    """.stripIndent();
 //
 //            processQuery(viewMessagesQuery,ENDPT.FIND.get());
-//             // can only call string once so need to store in string
-//            String toParse = stripDocument(postResponseBody);
+//             // can only call string once so need to store in string toParse = stripDocument(postResponseBody);
 //            System.out.println(toParse);
 //            ObjectMapper mapper = new ObjectMapper();
 //            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
@@ -225,8 +233,9 @@ public class QueryHandler {
         client = new OkHttpClient().newBuilder().build();
         mediaType = MediaType.parse("application/json");
         body = RequestBody.create(query, mediaType);
+        String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
         request = new Request.Builder()
-                .url("https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint))
+                .url(url)
                 .method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Access-Control-Request-Headers", "*")
@@ -239,6 +248,18 @@ public class QueryHandler {
 
         response.close();  // Close the client
 
+        System.out.printf("""
+        
+        ----HTTP Request Results----:
+            ::  Sent Query ::
+        %s
+            ::     URL     ::
+        %s
+            ::  Response   ::
+        Status Code: %d
+        Response Body:
+        %s
+        """, query,url,responseCode,postResponseBody);
     }
 
     public Boolean checkIfJarExists() throws IOException {
@@ -251,7 +272,8 @@ public class QueryHandler {
                 """.formatted(serverId);
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        return responseCode == 200;
+        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
@@ -267,16 +289,17 @@ public class QueryHandler {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
-        return responseCode == 201;
+        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
-        // this formats that string representative in a way of how it's inserted into the database thus deserilaization
+        // this formats that string representative in a way of how it's inserted into the database thus deserialization
         // should be easier
         return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
     }
 
-    public void createJar(Jar jar) throws IOException {
+    public void createJarQuery(Jar jar) throws IOException {
 
         String createJarQuery = """
                 {
@@ -286,7 +309,7 @@ public class QueryHandler {
                     "filter": { "serverID": "%s" },
                     "document": %s
                 }
-                """.formatted(serverId, jar).stripIndent();
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
@@ -314,6 +337,7 @@ public class QueryHandler {
         responseBuilder.invalidCommandResponse();
 
     }
+
 }
 
 
