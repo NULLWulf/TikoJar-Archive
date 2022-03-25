@@ -178,9 +178,6 @@ public class ResponseBuilder {
 
     }
 
-    public void jarExistsResponse(Boolean exists){}
-
-
     private String getNickname(){
 
         Server server = event.getServer().orElse(null);
