@@ -142,8 +142,7 @@ public class QueryHandler {
 //                    """.stripIndent();
 //
 //            processQuery(viewMessagesQuery,ENDPT.FIND.get());
-//             // can only call string once so need to store in string
-//            String toParse = stripDocument(postResponseBody);
+//             // can only call string once so need to store in string toParse = stripDocument(postResponseBody);
 //            System.out.println(toParse);
 //            ObjectMapper mapper = new ObjectMapper();
 //            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));

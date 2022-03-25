@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 public class testInserts {
 
-    public testInserts(){};
+    public testInserts(){}
 
     public static void run() throws IOException {
 //        JSON_Handler json_handler = new JSON_Handler();

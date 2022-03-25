@@ -53,4 +53,4 @@ Open Liberty performs at its best when running using Open J9 which can be obtain
 (https://developer.ibm.com/languages/java/semeru-runtimes/downloads/). For a full list of supported Java SE versions 
 and where to obtain them, reference the Java SE support page (https://openliberty.io/docs/latest/java-se.html).
 
-If you find any issues with the starter project or have recommendations to improve it, open an issue in the starter Github repo (https://github.com/OpenLiberty/start.openliberty.io).
+If you find any issues with the starter project or have recommendations to improve it, open an issue in the starter GitHub repo (https://github.com/OpenLiberty/start.openliberty.io).
