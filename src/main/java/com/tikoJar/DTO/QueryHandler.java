@@ -83,13 +83,10 @@ public class QueryHandler {
         }else{
             System.out.printf("""
                     Message not Added for
+                    %s : %s
                     """, serverName, serverId);
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
-
-//
-//                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
-          // TODO: delete server's jar
 
     }
 
@@ -279,11 +276,8 @@ public class QueryHandler {
                 """.formatted(serverId);
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        if (responseCode == 200){
-            return true;
-        }else{
-            return false;
-        }
+        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
@@ -299,7 +293,7 @@ public class QueryHandler {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
-        return responseCode == 201;
+        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
 
     }
 
