@@ -61,27 +61,13 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) throws IOException {
-
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
-
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-
-            jsonHelper = new JSON_Handler();   // initialize JSON helper
-            Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);  // Construct Message
-
-            // Block quotes query, is a NoSql Query that adds a message to the message array
-            String addMessageQuery = """
-                {"collection":"Jars",
-                "database":"TikoJarTest",
-                "dataSource":"PositivityJar",
-                "filter": { "serverID": "%s" },
-                "update": {
-                    "$push": {"messages": %s}}}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();  // converts newMessage to JSON format
-
-            processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+            if(checkIfMessageAdded(new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
             responseBuilder.addMessageResponse(true);  // Calls message added true response
-
+            else{
+                responseBuilder.addMessageResponse(false);
+            }
         }else{
             responseBuilder.jarExistsResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
@@ -287,6 +273,22 @@ public class QueryHandler {
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
         return responseCode == 200;
+    }
+
+    public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
+        jsonHelper = new JSON_Handler();   // initialize JSON helper
+
+        // Block quotes query, is a NoSql Query that adds a message to the message array
+        String addMessageQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" },
+                "update": {
+                    "$push": {"messages": %s}}}
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
+        processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+        return responseCode == 201;
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
