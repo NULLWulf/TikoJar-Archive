@@ -66,12 +66,10 @@ public class QueryHandler {
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
-            }
-            else{
-                responseBuilder.addMessageResponse(false);
+                
             }
         }else{
-            responseBuilder.jarExistsResponse(false);  // Jar does not exist, pass to response builder to indicate error
+            responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
 //
