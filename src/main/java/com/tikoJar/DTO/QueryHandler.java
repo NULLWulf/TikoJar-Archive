@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 public class QueryHandler {
 
-    private MessageCreateEvent event;
+    private final MessageCreateEvent event;
 
     private Long serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
@@ -33,7 +33,7 @@ public class QueryHandler {
     // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
 
-    // OKHTTP3 Library Objects, they are initliazed in the process query function
+    // OKHTTP3 Library Objects, they are initialized in the process query function
     // but declared within the class for each query method to access relevant data
     OkHttpClient client;
     MediaType mediaType;
@@ -41,6 +41,7 @@ public class QueryHandler {
     Request request;
     Response response;
 
+    // Stores variables from response from HTTP client, client is closed after call so values in Response are volatile
     String postResponseBody;
     int responseCode;
 
@@ -48,7 +49,7 @@ public class QueryHandler {
         this.event = event;
 
         // Anytime query handler called, since it is within the context of
-        // an individual discord server, constructors retrieves serverId and
+        // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
                 () -> System.out.println("Error retrieving Server name")
@@ -298,7 +299,7 @@ public class QueryHandler {
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
-        // this formats that string representative in a way of how it's inserted into the database thus deserilaization
+        // this formats that string representative in a way of how it's inserted into the database thus deserialization
         // should be easier
         return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
     }
