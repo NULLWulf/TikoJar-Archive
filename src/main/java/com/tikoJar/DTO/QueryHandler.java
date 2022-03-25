@@ -1,6 +1,14 @@
 package com.tikoJar.DTO;
 
+
+/*
+Authors (by Function)
+Nathan Wolf - QueryHandler Constructors,
+
+ */
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
@@ -19,7 +27,7 @@ public class QueryHandler {
     private Long serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
 
-    ResponseBuilder responseBuilder;
+    ResponseBuilder responseBuilder;  // instantiated based on need
 
     // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
@@ -32,6 +40,8 @@ public class QueryHandler {
     Request request;
     Response response;
 
+    String postResponseBody;
+    int responseCode;
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
@@ -50,68 +60,34 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) throws IOException {
+        responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
+        if(checkIfJarExists()){  // HTTP Requests to see if jar exists
+            if(checkIfMessageAdded(
+                    new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
+            responseBuilder.addMessageResponse(true);  // Calls message added true response
+            if(checkMessageLimit()){
 
-        responseBuilder = new ResponseBuilder(event);
-
-        if(checkIfJarExists()){
-
-            jsonHelper = new JSON_Handler();
-            Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);
-
-            String addMessageQuery = """
-                {"collection":"Jars",
-                "database":"TikoJarTest",
-                "dataSource":"PositivityJar",
-                "filter": { "serverID": "%s" },
-                "update": {
-                    "$push": { 
-                    "messages": %s}}}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();
-
-            processQuery(addMessageQuery,ENDPT.UPDATE.get());
-            responseBuilder.addMessageResponse(true);
-
+            }
         }else{
-
-            responseBuilder.addMessageResponse(false);
-
+            responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
-//        boolean messageAdded = false;
-//
-//        // TODO: if server has jar, store the message in it.
-//        // TODO: else, messageAdded = false
-//
-//        this.responseBuilder = new ResponseBuilder(null, event);
-//
-//        responseBuilder.addMessageResponse(messageAdded);
-//
-//        if(messageAdded){
-//
-//            if(checkMessageLimit()){
-//
-//                // TODO: retrieve jar from database
 //
 //                // TODO: replace responseBuilder with new ResponseBuilder, instantiated with response object
-//
-//                responseBuilder.messageLimitEvent();
-//
-//                // TODO: delete server's jar
-//
-//            }
-//        }
+          // TODO: delete server's jar
 
     }
 
-    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays){
+    private void pullJar() {
+    }
 
-        boolean hasJar = false;
+    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays) throws IOException {
 
         if(validSyntax && isAdmin){
 
             // TODO: check if server has jar. If it does, set hasJar to true.
 
-            if (!hasJar){
+            if (!checkIfJarExists()){
 
                 if (messageLimit != 0){
 
@@ -130,39 +106,38 @@ public class QueryHandler {
 
                 }
 
+            }else{
+                responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
-
+        }else{
+            responseBuilder.createJarResponse(validSyntax, isAdmin, false);
         }
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.createJarResponse(validSyntax, isAdmin, hasJar);
 
     }
 
     public void viewMessages(boolean isAdmin) throws IOException {
-
-        if(checkIfJarExists()){
-
-            String viewMessagesQuery = """
-                        {
-                            "collection":"Jars",
-                            "database":"TikoJarTest",
-                            "dataSource":"PositivityJar",
-                            "filter": { "serverID": "ABC123" }
-                        }
-                    """.stripIndent();
-
-            processQuery(viewMessagesQuery,ENDPT.FIND.get());
-            String messages = Objects.requireNonNull(response.body()).string(); // can only call string once so need to store in string
-            String toParse = StringUtils.substring(messages,12, messages.length() - 1);  // removes Document enclosure
-            System.out.println(toParse);
-            ObjectMapper mapper = new ObjectMapper();
-            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
-
-        }else{
-
-        }
+//
+//        if(checkIfJarExists()){
+//
+//            String viewMessagesQuery = """
+//                        {
+//                            "collection":"Jars",
+//                            "database":"TikoJarTest",
+//                            "dataSource":"PositivityJar",
+//                            "filter": { "serverID": "ABC123" }
+//                        }
+//                    """.stripIndent();
+//
+//            processQuery(viewMessagesQuery,ENDPT.FIND.get());
+//             // can only call string once so need to store in string
+//            String toParse = stripDocument(postResponseBody);
+//            System.out.println(toParse);
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
+//
+//        }else{
+//
+//        }
 
 //        // TODO: verify that server has a jar
 //        // TODO: else, hasJar = false
@@ -224,30 +199,6 @@ public class QueryHandler {
 
     }
 
-    public void getHelp(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.getHelpResponse();
-
-    }
-
-    public void hello(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.helloResponse();
-
-    }
-
-    public void invalidCommand(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.invalidCommandResponse();
-
-    }
-
     public boolean checkMessageLimit(){
 
         boolean messageLimitReached = false;
@@ -282,7 +233,11 @@ public class QueryHandler {
                 .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                 .build();
 
-        response = client.newCall(request).execute();
+        response = client.newCall(request).execute();  // execute the request
+        postResponseBody = Objects.requireNonNull(response.body()).string(); // stores response body as a String
+        responseCode = response.code();  // Stores response code as an int
+
+        response.close();  // Close the client
 
     }
 
@@ -296,13 +251,69 @@ public class QueryHandler {
                 """.formatted(serverId);
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+        return responseCode == 200;
+    }
 
-        return response.code() == 200;
+    public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
+        jsonHelper = new JSON_Handler();   // initialize JSON helper
+
+        // Block quotes query, is a NoSql Query that adds a message to the message array
+        String addMessageQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" },
+                "update": {
+                    "$push": {"messages": %s}}}
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
+        processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+        return responseCode == 201;
+    }
+
+    public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
+        // this formats that string representative in a way of how it's inserted into the database thus deserilaization
+        // should be easier
+        return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
+    }
+
+    public void createJar(Jar jar) throws IOException {
+
+        String createJarQuery = """
+                {
+                    "collection":"Jars",
+                    "database":"TikoJarTest",
+                    "dataSource":"PositivityJar",
+                    "filter": { "serverID": "%s" },
+                    "document": %s
+                }
+                """.formatted(serverId, jar).stripIndent();
+
+        processQuery(createJarQuery,ENDPT.INSERT.get());
+    }
+
+    public void getHelp(){
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.getHelpResponse();
 
     }
 
-    public void checkResponseCode(){
-        int responseCode = response.code();
+    public void hello(){
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.helloResponse();
+
     }
 
+    public void invalidCommand(){
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.invalidCommandResponse();
+
+    }
 }
+
+

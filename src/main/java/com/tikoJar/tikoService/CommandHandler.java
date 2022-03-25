@@ -38,7 +38,6 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
-
         String token = TokenHandler.TOKEN;
 
         DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
@@ -153,7 +152,11 @@ public class CommandHandler {
 
                                 }
 
-                                queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
+                                try {
+                                    queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.VIEWMESSAGES.getCommand())) {
