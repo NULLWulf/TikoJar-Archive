@@ -67,6 +67,8 @@ public class CommandHandler {
 
                             if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
+                                // TODO: ADD MESSAGE LENGTH LIMIT (250 WORDS)
+
                                 StringBuilder message = new StringBuilder();
 
                                 message.append(messageContent[2]);

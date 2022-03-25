@@ -210,13 +210,13 @@ public class QueryHandler {
 
     }
 
-    public void checkTimeLimits(){
+    public static void checkTimeLimits(){
 
         // TODO: query all jars that have time limits && the limit's date is <= today's date
 
-        // TODO: instantiate responseBuilder with response object
+        // TODO: instantiate new "responseBuilder" with response object
 
-        this.responseBuilder.timeLimitEvent();
+        // TODO: "responseBuilder".timeLimitEvent();
 
     }
 
