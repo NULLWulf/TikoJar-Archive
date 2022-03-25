@@ -1,13 +1,13 @@
 package com.tikoJar.DTO;
-
-
 /*
 Authors (by Function)
-Nathan Wolf - QueryHandler Constructors,
+Nathan Wolf - QueryHandler Constructors, addMessage, viewMessage, checkMessageLimits
+    - checkIfJarExists, checkIfMessageAdded, pullJar, processQuery, stripJar, createJarQuery
+Joel Santos - createJar, checkTimeLimits, deleteMessage, deleteJar
+Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
@@ -16,10 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class QueryHandler {
 
@@ -61,7 +58,6 @@ public class QueryHandler {
                     Initializing QueryHandler for
                     %s : %s
                     """, serverName, serverId);
-
     }
 
     public void addMessage(String message) throws IOException {
@@ -303,7 +299,7 @@ public class QueryHandler {
         return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
     }
 
-    public void createJar(Jar jar) throws IOException {
+    public void createJarQuery(Jar jar) throws IOException {
 
         String createJarQuery = """
                 {
@@ -313,7 +309,7 @@ public class QueryHandler {
                     "filter": { "serverID": "%s" },
                     "document": %s
                 }
-                """.formatted(serverId, jar).stripIndent();
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
