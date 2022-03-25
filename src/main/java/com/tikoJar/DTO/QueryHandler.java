@@ -1,14 +1,21 @@
 package com.tikoJar.DTO;
 
+
+/*
+Authors (by Function)
+Nathan Wolf -
+
+ */
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
+import kotlin._Assertions;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
-import java.lang.invoke.StringConcatFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +27,7 @@ public class QueryHandler {
     private Long serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
 
-    ResponseBuilder responseBuilder;
+    ResponseBuilder responseBuilder;  // instantiated based on need
 
     // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
@@ -32,6 +39,9 @@ public class QueryHandler {
     RequestBody body;
     Request request;
     Response response;
+
+    String postResponseBody;
+    int responseCode;
 
 
     public QueryHandler(MessageCreateEvent event){
@@ -52,30 +62,28 @@ public class QueryHandler {
 
     public void addMessage(String message) throws IOException {
 
-        responseBuilder = new ResponseBuilder(event);
+        responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
 
-        if(checkIfJarExists()){
+        if(checkIfJarExists()){  // HTTP Requests to see if jar exists
 
-            jsonHelper = new JSON_Handler();
-            Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);
+            jsonHelper = new JSON_Handler();   // initialize JSON helper
+            Message newMessage = new Message(event.getMessageAuthor().getDisplayName().toString(), message);  // Construct Message
 
+            // Block quotes query, is a NoSql Query that adds a message to the message array
             String addMessageQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" },
                 "update": {
-                    "$push": { 
-                    "messages": %s}}}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();
+                    "$push": {"messages": %s}}}
+                """.formatted(serverId, jsonHelper.getObjAsJSONString(newMessage)).stripIndent();  // converts newMessage to JSON format
 
-            processQuery(addMessageQuery,ENDPT.UPDATE.get());
-            responseBuilder.addMessageResponse(true);
+            processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+            responseBuilder.addMessageResponse(true);  // Calls message added true response
 
         }else{
-
-            responseBuilder.addMessageResponse(false);
-
+            responseBuilder.jarExistsResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
 //        boolean messageAdded = false;
@@ -155,8 +163,8 @@ public class QueryHandler {
                     """.stripIndent();
 
             processQuery(viewMessagesQuery,ENDPT.FIND.get());
-            String messages = Objects.requireNonNull(response.body()).string(); // can only call string once so need to store in string
-            String toParse = StringUtils.substring(messages,12, messages.length() - 1);  // removes Document enclosure
+             // can only call string once so need to store in string
+            String toParse = stripDocument(postResponseBody);
             System.out.println(toParse);
             ObjectMapper mapper = new ObjectMapper();
             List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
@@ -225,29 +233,6 @@ public class QueryHandler {
 
     }
 
-    public void getHelp(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.getHelpResponse();
-
-    }
-
-    public void hello(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.helloResponse();
-
-    }
-
-    public void invalidCommand(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
-        responseBuilder.invalidCommandResponse();
-
-    }
 
     public boolean checkMessageLimit(){
 
@@ -283,7 +268,11 @@ public class QueryHandler {
                 .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                 .build();
 
-        response = client.newCall(request).execute();
+        response = client.newCall(request).execute();  // execute the request
+        postResponseBody = Objects.requireNonNull(response.body()).string(); // stores response body as a String
+        responseCode = response.code();  // Stores response code as an int
+
+        response.close();  // Close the client
 
     }
 
@@ -297,21 +286,38 @@ public class QueryHandler {
                 """.formatted(serverId);
 
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+        return responseCode == 200;
+    }
 
-        return response.code() == 200;
+    public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
+        // this formats that string representative in a way of how it's inserted into the database thus deserilaization
+        // should be easier
+        return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
+    }
+
+    public void getHelp(){
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.getHelpResponse();
 
     }
 
-    public void checkResponseCode(){
+    public void hello(){
 
-        String result = switch (response.code()){
-            case 200 -> "Successfully found";
-            case 201 -> "New Entity Created";
-            case 400 -> "Bad Syntax in Request";
-            case 401 -> "Unauthorized request, check API keys";
-            default -> throw new IllegalStateException("Unexpected value: " + response.code());
-        };
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.helloResponse();
 
     }
 
+    public void invalidCommand(){
+
+        this.responseBuilder = new ResponseBuilder(null, event);
+
+        responseBuilder.invalidCommandResponse();
+
+    }
 }
+
+

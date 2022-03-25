@@ -6,6 +6,8 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.nio.file.FileAlreadyExistsException;
+
 public class ResponseBuilder {
 
     private String responseCode;
@@ -175,6 +177,9 @@ public class ResponseBuilder {
                 "valid commands.");
 
     }
+
+    public void jarExistsResponse(Boolean exists){}
+
 
     private String getNickname(){
 
