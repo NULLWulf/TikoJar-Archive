@@ -50,37 +50,37 @@ public class QueryHandler {
 
     Jar currentJar;  // is deserialized to if function is called ot do so
 
-    public QueryHandler(MessageCreateEvent event){
+    public QueryHandler(MessageCreateEvent event) {
         this.event = event;
 
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
-                () -> System.out.println("Error retrieving Server name")
-        );
+                () -> CommandHandler.LOGGER.warn("Error retrieving Server name"));
+
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
-                () -> System.out.println("Error retrieving Server ID from Javacord API")
-        );
-        System.out.printf("""
-                    Initializing QueryHandler for
-                    %s : %s
-                    """, serverName, serverId);
+                () -> CommandHandler.LOGGER.warn("Error retrieving Server ID from Javacord API"));
+
+        CommandHandler.LOGGER.trace("""
+                Initializing QueryHandler for
+                %s : %s
+                """.formatted(serverName, serverId));
     }
 
     public void addMessage(String message) {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            System.out.printf("""
+            CommandHandler.LOGGER.debug("""
                     Jar Exists for Server: %s : %s
                     Checking if Message Added...
-                    """, serverName, serverId);
+                    """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
-                System.out.printf("""
+                CommandHandler.LOGGER.debug("""
                     Message Added for: %s : %s
                     Checking if Message Added...
-                    """, serverName, serverId);
+                    """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
@@ -215,7 +215,7 @@ public class QueryHandler {
         %s
         """, query,url,responseCode,postResponseBody);
         } catch (IOException e) {
-            e.printStackTrace();
+            CommandHandler.LOGGER.warn(e.getMessage());
         }
 
     }
@@ -242,8 +242,7 @@ public class QueryHandler {
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
         }catch (JsonProcessingException e){
-            e.printStackTrace();
-
+            CommandHandler.LOGGER.warn(e.getMessage());
         }
     }
 
@@ -286,7 +285,7 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-        CommandHandler.LOGGER.info("""
+        CommandHandler.LOGGER.debug("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -294,7 +293,7 @@ public class QueryHandler {
     }
 
     public void hello(){
-        CommandHandler.LOGGER.info("""
+        CommandHandler.LOGGER.debug("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -302,7 +301,7 @@ public class QueryHandler {
     }
 
     public void invalidCommand(){
-        CommandHandler.LOGGER.info("""
+        CommandHandler.LOGGER.debug("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
