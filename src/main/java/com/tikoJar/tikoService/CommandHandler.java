@@ -1,8 +1,5 @@
 package com.tikoJar.tikoService;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tikoJar.DAO.Message;
-import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
