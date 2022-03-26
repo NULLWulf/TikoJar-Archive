@@ -6,6 +6,5 @@ curl --location --request POST 'https://data.mongodb-api.com/app/data-rlgbq/endp
     "collection":"Jars",
     "database":"TikoJarTest",
     "dataSource":"PositivityJar",
-    "filter": { "serverID": "%s" },
     "document": %s
 }' | json_pp

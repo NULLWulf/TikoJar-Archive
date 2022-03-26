@@ -8,6 +8,9 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
@@ -85,9 +88,6 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
-    }
-
-    private void pullJar() {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays) throws IOException {
@@ -274,6 +274,14 @@ public class QueryHandler {
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
 
+    }
+
+    private void deserializeJarFromResponseBody() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
+        Jar jar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
+                stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
+                Jar.class);  // needed so Jackson understand how to map the class
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
