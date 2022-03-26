@@ -129,7 +129,7 @@ public class QueryHandler {
 
     }
 
-    public void viewMessages(boolean isAdmin) throws IOException {
+    public void viewMessages(boolean isAdmin) {
 
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
