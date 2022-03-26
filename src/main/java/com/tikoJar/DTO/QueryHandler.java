@@ -77,7 +77,7 @@ public class QueryHandler {
                     Jar Exists for Server: %s : %s
                     """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
-                    new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
+                    new Message(event.getMessageAuthor().getIdAsString(), message)))
                 LOGGER.info("""
                     Checking if Message Added: %s : %s
                     """.formatted(serverName, serverId));
