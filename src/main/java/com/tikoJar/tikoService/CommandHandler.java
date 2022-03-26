@@ -83,12 +83,7 @@ public class CommandHandler {
                                     }
 
                                 }
-
-                                try {
-                                    queryHandler.addMessage(message.toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                queryHandler.addMessage(message.toString());
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {
@@ -152,11 +147,8 @@ public class CommandHandler {
 
                                 }
 
-                                try {
                                     queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.VIEWMESSAGES.getCommand())) {
@@ -167,11 +159,7 @@ public class CommandHandler {
 
                                 } else {
 
-                                    try {
                                         queryHandler.viewMessages(isAdmin);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
 
                                 }
 
