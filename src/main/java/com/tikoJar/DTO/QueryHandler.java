@@ -26,6 +26,8 @@ import java.util.Objects;
 
 public class QueryHandler {
 
+    public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
+
     private final MessageCreateEvent event;
 
     private Long serverId;  // serverID are Long data types
@@ -57,12 +59,12 @@ public class QueryHandler {
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
-                () -> CommandHandler.LOGGER.warn("Error retrieving Server name"));
+                () -> LOGGER.warn("Error retrieving Server name"));
 
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
-                () -> CommandHandler.LOGGER.warn("Error retrieving Server ID from Javacord API"));
+                () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
 
-        CommandHandler.LOGGER.trace("""
+        LOGGER.trace("""
                 Initializing QueryHandler for
                 %s : %s
                 """.formatted(serverName, serverId));
@@ -71,15 +73,13 @@ public class QueryHandler {
     public void addMessage(String message) {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            CommandHandler.LOGGER.debug("""
+            LOGGER.info("""
                     Jar Exists for Server: %s : %s
-                    Checking if Message Added...
                     """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
-                CommandHandler.LOGGER.debug("""
-                    Message Added for: %s : %s
-                    Checking if Message Added...
+                LOGGER.info("""
+                    Checking if Message Added: %s : %s
                     """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
@@ -89,10 +89,9 @@ public class QueryHandler {
                 // this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
-            System.out.printf("""
-                    Message not Added for
-                    %s : %s
-                    """, serverName, serverId);
+            LOGGER.info("""
+                    Message not Added for %s : %s
+                    """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
@@ -202,8 +201,7 @@ public class QueryHandler {
             responseCode = response.code();  // Stores response code as an int
 
             response.close();  // Close the client
-            System.out.printf("""
-        
+            LOGGER.debug("""
         ----HTTP Request Results----:
             ::  Sent Query ::
         %s
@@ -213,9 +211,9 @@ public class QueryHandler {
         Status Code: %d
         Response Body:
         %s
-        """, query,url,responseCode,postResponseBody);
+        """.formatted(query,url,responseCode,postResponseBody));
         } catch (IOException e) {
-            CommandHandler.LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage());
         }
 
     }
@@ -242,7 +240,7 @@ public class QueryHandler {
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
         }catch (JsonProcessingException e){
-            CommandHandler.LOGGER.warn(e.getMessage());
+            LOGGER.warn(e.getMessage());
         }
     }
 
@@ -285,7 +283,7 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-        CommandHandler.LOGGER.debug("""
+        LOGGER.info("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -293,7 +291,7 @@ public class QueryHandler {
     }
 
     public void hello(){
-        CommandHandler.LOGGER.debug("""
+        LOGGER.info("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -301,7 +299,7 @@ public class QueryHandler {
     }
 
     public void invalidCommand(){
-        CommandHandler.LOGGER.debug("""
+        LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);

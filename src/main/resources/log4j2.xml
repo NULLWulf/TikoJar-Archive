@@ -6,6 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="com.tikoJar.DTO" level="ALL" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
         <Root level="DEBUG">
             <AppenderRef ref="Console"/>
         </Root>
