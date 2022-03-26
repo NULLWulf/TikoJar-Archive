@@ -45,6 +45,8 @@ public class QueryHandler {
     String postResponseBody;
     int responseCode;
 
+    Jar currentJar = new Jar();
+
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
 
@@ -77,8 +79,9 @@ public class QueryHandler {
                     Checking if Message Added...
                     """, serverName, serverId);
             responseBuilder.addMessageResponse(true);  // Calls message added true response
+            deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
-
+                // currentJar gets sent to ResponseBuilder
             }
         }else{
             System.out.printf("""
@@ -125,52 +128,12 @@ public class QueryHandler {
     }
 
     public void viewMessages(boolean isAdmin) throws IOException {
-//
-//        if(checkIfJarExists()){
-//
-//            String viewMessagesQuery = """
-//                        {
-//                            "collection":"Jars",
-//                            "database":"TikoJarTest",
-//                            "dataSource":"PositivityJar",
-//                            "filter": { "serverID": "ABC123" }
-//                        }
-//                    """.stripIndent();
-//
-//            processQuery(viewMessagesQuery,ENDPT.FIND.get());
-//             // can only call string once so need to store in string toParse = stripDocument(postResponseBody);
-//            System.out.println(toParse);
-//            ObjectMapper mapper = new ObjectMapper();
-//            List<Message> messageJar = Arrays.asList(mapper.readValue(toParse, Message[].class));
-//
-//        }else{
-//
-//        }
 
-//        // TODO: verify that server has a jar
-//        // TODO: else, hasJar = false
-//
-//        if(hasJar){
-//
-//            if(isAdmin){
-//
-//                // TODO: query all messages for jar
-//
-//            } else {
-//
-//                // TODO: query only the user's messages for jar
-//
-//            }
-//
-//            // TODO: instantiate responseBuilder with response object
-//
-//        } else {
-//
-//            responseBuilder = new ResponseBuilder(null, event);
-//
-//        }
-//
-//        responseBuilder.viewMessagesResponse();
+        if(checkIfJarExists()){
+            deserializeJarFromResponseBody();
+            // passing Admin function and currentJar for extrapulation in response builder
+            // this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+        }
     }
 
     public void deleteMessage(boolean includedMessageID, String messageID){
@@ -208,23 +171,10 @@ public class QueryHandler {
     }
 
     public boolean checkMessageLimit(){
-
-        boolean messageLimitReached = false;
-
-        // TODO: check if message limit has been reached
-        // TODO: if message limit is reached, set messageLimitReached = true;
-
-        return messageLimitReached;
-
+        return currentJar.getOpeningCondition().getMessageLimit() == currentJar.getMessages().size();
     }
 
     public static void checkTimeLimits(){
-
-        // TODO: query all jars that have time limits && the limit's date is <= today's date
-
-        // TODO: instantiate new "responseBuilder" with response object
-
-        // TODO: "responseBuilder".timeLimitEvent();
 
     }
 
@@ -276,12 +226,12 @@ public class QueryHandler {
 
     }
 
-    private Jar deserializeJarFromResponseBody() throws JsonProcessingException {
+    private void deserializeJarFromResponseBody() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
-        return objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
+        this.currentJar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
                 stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
-                Jar.class);
+                Jar.class);  // stores it in currentJar object in class
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {

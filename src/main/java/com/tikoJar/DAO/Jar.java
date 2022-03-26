@@ -48,11 +48,11 @@ public class Jar {
         this.openingCondition = openingCondition;
     }
 
-    public ArrayList<Message> getMessage() {
+    public ArrayList<Message> getMessages() {
         return messages;
     }
 
-    public void setMessage(ArrayList<Message> person) {
+    public void setMessages(ArrayList<Message> person) {
         this.messages = person;
     }
 
