@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.security.cert.CertificateParsingException;
 
 public class CommandHandler {
 
@@ -39,6 +42,9 @@ public class CommandHandler {
 
     public static void main(String[] args) throws IOException {
 
+        Logger logger = Logger.getLogger(CommandHandler.class);
+        BasicConfigurator.configure();
+        logger.info("This is my first log4j's statement");
 
         String token = TokenHandler.TOKEN;
 
