@@ -1,12 +1,13 @@
 package com.tikoJar.DTO;
 
 import com.tikoJar.DAO.Jar;
+import com.tikoJar.DAO.Message;
 import jakarta.json.JsonObject;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import java.nio.file.FileAlreadyExistsException;
+import java.util.ArrayList;
 
 public class ResponseBuilder {
 
@@ -81,7 +82,7 @@ public class ResponseBuilder {
         }
     }
 
-    public void viewMessagesResponse(){
+    public void viewMessagesResponse(boolean isAdmin, Jar jar){
 
         if(responseCode == null){
 
@@ -90,7 +91,41 @@ public class ResponseBuilder {
 
         } else {
 
-            // TODO: format and deliver response
+            StringBuilder responseString = new StringBuilder("");
+
+            ArrayList<Message> messages = jar.getMessages();
+
+            if (messages.size() > 0) {
+
+                String userID = event.getMessageAuthor().getIdAsString();
+
+                if (isAdmin) {
+
+                    responseString.append("**Showing all messages:**\n\n");
+
+                } else {
+
+                    String nickname = getNickname();
+
+                    responseString.append("**Showing messages submitted by " + nickname + ":**\n\n");
+
+                }
+
+                for (int i = 0; i < messages.size(); i++){
+
+                    if (isAdmin || messages.get(i).getUserID().equals(userID)){
+
+
+
+                    }
+
+                }
+
+            } else {
+
+                event.getChannel().sendMessage("This jar is currently empty.");
+
+            }
 
         }
 
