@@ -282,27 +282,30 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        System.out.printf("""
+                    Help Function Called for: %s : %s
+                    
+                    """, serverName, serverId);
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.getHelpResponse();
-
     }
 
     public void hello(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        System.out.printf("""
+                    Hello Function Called for: %s : %s
+                    
+                    """, serverName, serverId);
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.helloResponse();
-
     }
 
     public void invalidCommand(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        System.out.printf("""
+                    Invalid Command Function Called for: %s : %s
+                    
+                    """, serverName, serverId);
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.invalidCommandResponse();
-
     }
 
 }
