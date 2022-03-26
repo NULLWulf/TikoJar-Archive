@@ -10,7 +10,8 @@ public enum ENDPT {
     INSERT("insertOne"),
     UPDATE("updateOne"),
     DELETE("deleteOne"),
-    AGG("aggregate");
+    AGG("aggregate"),
+    FINDALL("findAll");
 
     private final String endPoint;
 

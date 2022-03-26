@@ -22,6 +22,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -86,8 +87,6 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
-                // currentJar gets sent to ResponseBuilder
-                // currentJar sent to response builder message limit event
                  this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
@@ -100,39 +99,28 @@ public class QueryHandler {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
-
         if(validSyntax && isAdmin){
-
-            // TODO: check if server has jar. If it does, set hasJar to true.
-
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else
-
                 {
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
-
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
         }else{
             responseBuilder.createJarResponse(validSyntax, isAdmin, false);
         }
-
     }
 
     public void viewMessages(boolean isAdmin) {
-
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-            jsonHelper = new JSON_Handler();
-            LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
             this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
             LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
@@ -153,28 +141,39 @@ public class QueryHandler {
     }
 
     public void deleteJar(boolean isAdmin){
-
         boolean jarDeleted = true;
-
         if(isAdmin){
-
-            // TODO: delete jar if it exists
-            // TODO: update jarDeleted boolean
-
+            if(checkIfJarExists()){
+                deleteJarQuery();
+            }else{
+                responseBuilder.deleteJarResponse(isAdmin, false);
+                LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
+            }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
-
     }
 
     public boolean checkMessageLimit(){
         return currentJar.getOpeningCondition().getMessageLimit() == currentJar.getMessages().size();
     }
 
-    public static void checkTimeLimits(){
+    public void checkTimeLimits(){
+
+        String checkAndReturnExpired = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "openingCondition.hasMessageLimit": { $eq : true },
+                            "openingCondition.hasMessageLimit": { $eq : "%s }}}
+                """.formatted(LocalDate.now().toString());
+        processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
+
+        String match = """
+                {"document":null}""";
+
     }
 
     public void processQuery(String query, String endPoint) {
-
         try {
             client = new OkHttpClient().newBuilder().build();
             mediaType = MediaType.parse("application/json");
@@ -222,13 +221,27 @@ public class QueryHandler {
         return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
     }
 
+    public void deleteJarQuery() {
+        String checkJarExistsQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}
+                """.formatted(serverId);
+        processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        LOGGER.log(Level.valueOf("Delete Jar Query Processed for: %s : %s"), serverName,serverId);
+    }
+
     private void deserializeJarFromResponseBody() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
+            jsonHelper = new JSON_Handler();
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
             this.currentJar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
+            LOGGER.debug(jsonHelper.getObjAsJSONString(this.currentJar));
+            LOGGER.debug(this.currentJar.getMessages().size());
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
