@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
+import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,8 @@ public class QueryHandler {
     public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
         this.api = api;
+        this.responseBuilder = new ResponseBuilder(this.event, this.api);
+
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
@@ -70,7 +73,6 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) {
-        responseBuilder = new ResponseBuilder(event, api); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
                     Jar Exists for Server: %s : %s
@@ -102,18 +104,16 @@ public class QueryHandler {
 
             // TODO: check if server has jar. If it does, set hasJar to true.
 
-            if (!checkIfJarExists()){
+            if (checkIfJarExists()){
+
 
                 if (messageLimit != 0){
-
-                    // TODO: Store jar with message limit in database
-
+                    createJarQuery(new Jar(this.serverId, this.serverName,
+                            new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else {
-
-                    // TODO: Store jar with time limit in database
-
+                    createJarQuery(new Jar(this.serverId, this.serverName,
+                            new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
-
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
@@ -247,13 +247,13 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
+        this.jsonHelper = new JSON_Handler();
         String createJarQuery = """
                 {"collection":"Jars",
                     "database":"TikoJarTest",
                     "dataSource":"PositivityJar",
-                    "filter": { "serverID": "%s" },
                     "document": %s}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
+                """.formatted(jsonHelper.getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
@@ -261,21 +261,18 @@ public class QueryHandler {
         LOGGER.info("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.getHelpResponse();
     }
     public void hello(){
         LOGGER.info("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.helloResponse();
     }
     public void invalidCommand(){
         LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.invalidCommandResponse();
     }
 }
