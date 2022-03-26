@@ -15,11 +15,15 @@ public class JSON_Handler {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
     // simply returns passed object as formatted JSON string
-    public String getObjAsJSONString(Object object) throws JsonProcessingException {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
-
+    public String getObjAsJSONString(Object object)  {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+            return null;
+        }
     }
-    public void displayObjectAsJson(Object object) throws JsonProcessingException {
+    public void displayObjectAsJson(Object object)  {
         System.out.println(this.getObjAsJSONString(object));
     }
 

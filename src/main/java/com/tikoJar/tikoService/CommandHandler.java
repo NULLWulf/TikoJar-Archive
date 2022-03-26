@@ -83,7 +83,6 @@ public class CommandHandler {
                                     }
 
                                 }
-
                                 try {
                                     queryHandler.addMessage(message.toString());
                                 } catch (IOException e) {
