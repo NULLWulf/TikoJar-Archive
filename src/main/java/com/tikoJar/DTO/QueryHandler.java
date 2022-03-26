@@ -26,6 +26,25 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class QueryHandler {
+    private enum ENDPT {
+
+        FIND("findOne"),
+        INSERT("insertOne"),
+        UPDATE("updateOne"),
+        DELETE("deleteOne"),
+        AGG("aggregate"),
+        FINDALL("findAll");
+
+        private final String endPoint;
+
+        ENDPT(String endPoint) {
+            this.endPoint = endPoint;
+        }
+
+        public String get() {
+            return endPoint;
+        }  // Gets enumerated endpoint
+    }
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
 
@@ -33,7 +52,6 @@ public class QueryHandler {
     DiscordApi api;
 
     private String serverId;  // serverID are Long data types
-    private String serverName; // serverNames are string
 
     ResponseBuilder responseBuilder;  // instantiated based on need
 
@@ -60,39 +78,36 @@ public class QueryHandler {
         this.responseBuilder = new ResponseBuilder(this.event, this.api);
 
         // Anytime query handler called, since it is within the context of
-        // an individual discord server, constructors retrieves serverId
-        // and serverName, may change, in actuality serverId may be all that is required here
-        event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
-                () -> LOGGER.warn("Error retrieving Server name"));
+        // an individual discord server, constructors retrieves serverID
 
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getIdAsString(),
                 () -> LOGGER.warn("Error retrieving Server ID from Java-cord API"));
 
         LOGGER.trace("""
                 Initializing QueryHandler for
-                %s : %s
-                """.formatted(serverName, serverId));
+                %s
+                """.formatted(serverId));
     }
 
     public void addMessage(String message) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
-                    Jar Exists for Server: %s : %s
-                    """.formatted(serverName, serverId));
+                    Jar Exists for Server: %s
+                    """.formatted(serverId));
             if(checkIfMessageAdded(
                     new Message(event.getMessageAuthor().getIdAsString(), message)))
                 LOGGER.info("""
-                    Checking if Message Added: %s : %s
-                    """.formatted(serverName, serverId));
+                    Checking if Message Added: %s
+                    """.formatted(serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
-            deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
+            deserializeJarFromResponseBody(); // Deserializes jar fromm ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
                  this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
             LOGGER.info("""
-                    Message not Added for %s : %s
-                    """.formatted(serverName, serverId));
+                    Message not Added for %s 
+                    """.formatted(serverId));
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
@@ -102,11 +117,11 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-                    createJarQuery(new Jar(this.serverId, this.serverName,
-                            new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
+                    createJarQuery(new Jar(this.serverId,
+                            new OpeningCondition(true, messageLimit, 0 , event.getChannel().getIdAsString())));
                 } else
                 {
-                    createJarQuery(new Jar(this.serverId, this.serverName,
+                    createJarQuery(new Jar(this.serverId,
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
             }else{
@@ -123,7 +138,7 @@ public class QueryHandler {
             // passing Admin function and currentJar for extrapolation in response builder
             this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
-            LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
+            LOGGER.log(Level.valueOf("No Jar found for: %s"),serverId);
         }
     }
 
@@ -134,6 +149,7 @@ public class QueryHandler {
         if(includedMessageID){
 
             // TODO: delete message if it exists
+
             // TODO: else, messageDeleted = false;
 
         }
@@ -147,7 +163,7 @@ public class QueryHandler {
                 deleteJarQuery();
             }else{
                 responseBuilder.deleteJarResponse(isAdmin, false);
-                LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
+                LOGGER.log(Level.valueOf("No Jar found for: %s"), serverId);
             }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
@@ -229,7 +245,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
-        LOGGER.log(Level.valueOf("Delete Jar Query Processed for: %s : %s"), serverName,serverId);
+        LOGGER.log(Level.valueOf("Delete Jar Query Processed for: %s"), serverId);
     }
 
     private void deserializeJarFromResponseBody() {
@@ -281,20 +297,20 @@ public class QueryHandler {
     }
     public void getHelp(){
         LOGGER.info("""
-                getHelp() Function Called for: %s : %s
-                """.formatted(serverId, serverName));
+                getHelp() Function Called for: %s
+                """.formatted(serverId));
         responseBuilder.getHelpResponse();
     }
     public void hello(){
         LOGGER.info("""
-                hello() Function Called for: %s : %s
-                """.formatted(serverId, serverName));
+                hello() Function Called for: %s
+                """.formatted(serverId));
         responseBuilder.helloResponse();
     }
     public void invalidCommand(){
         LOGGER.info("""
-                invalidCommand() Function Called for: %s : %s
-                """.formatted(serverId, serverName));
+                invalidCommand() Function Called for: %s
+                """.formatted(serverId));
         responseBuilder.invalidCommandResponse();
     }
 }
