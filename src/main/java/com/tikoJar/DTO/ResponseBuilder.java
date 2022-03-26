@@ -3,6 +3,7 @@ package com.tikoJar.DTO;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import jakarta.json.JsonObject;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -11,27 +12,18 @@ import java.util.ArrayList;
 
 public class ResponseBuilder {
 
-    private String responseCode;
     private final MessageCreateEvent event;
     private Jar jar;
+    private DiscordApi api;
 
     public ResponseBuilder(MessageCreateEvent event){
         this.event = event;
     }
 
-    public ResponseBuilder(JsonObject responseObject, MessageCreateEvent event){
+    public ResponseBuilder(MessageCreateEvent event, DiscordApi api){
 
         this.event = event;
-
-        if(responseObject == null){
-
-            responseCode = null;
-
-        } else {
-
-            deserializeResponse(responseObject);
-
-        }
+        this.api = api;
 
     }
 
@@ -84,7 +76,8 @@ public class ResponseBuilder {
 
     public void viewMessagesResponse(boolean isAdmin, Jar jar){
 
-        if(responseCode == null){
+        // if no jar exists
+        if(jar == null){
 
             event.getChannel().sendMessage("I'm sorry, your server does not currently have a jar. If you" +
                     "are a server admin, you can create one! Use '!tiko help' for a list of my commands.");
@@ -97,6 +90,7 @@ public class ResponseBuilder {
 
             if (messages.size() > 0) {
 
+                Server server = event.getServer().orElse(null);
                 String userID = event.getMessageAuthor().getIdAsString();
 
                 if (isAdmin) {
@@ -116,6 +110,8 @@ public class ResponseBuilder {
                     if (isAdmin || messages.get(i).getUserID().equals(userID)){
 
 
+                        String date = messages.get(i).getDatePosted();
+                        // String author = DiscordApi.getUser messages.get(i).getUserID()
 
                     }
 
