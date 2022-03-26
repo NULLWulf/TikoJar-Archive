@@ -3,7 +3,6 @@ package com.tikoJar.tests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tikoJar.DAO.Jar;
 
 public class JSON_Handler {
 
