@@ -82,6 +82,8 @@ public class QueryHandler {
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
                 // currentJar gets sent to ResponseBuilder
+                // currentJar sent to response builder message limit event
+                // this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
             System.out.printf("""
@@ -131,7 +133,7 @@ public class QueryHandler {
 
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
-            // passing Admin function and currentJar for extrapulation in response builder
+            // passing Admin function and currentJar for extrapolation in response builder
             // this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }
     }
