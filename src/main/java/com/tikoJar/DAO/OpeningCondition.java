@@ -13,13 +13,14 @@ public class OpeningCondition {
     private String openingDate;
     private String serverChannelID;
 
-    public OpeningCondition(){}
+    public OpeningCondition(){}  // Empty constructor for Jackson
 
+    // Primary Constructor OpeningCondition, this should be nested inside the Jar constructor during createJars
     public OpeningCondition(boolean hasMessageLimit, int messageLimit, int timeLimitInDays, String serverChannelID) {
         this.hasMessageLimit = hasMessageLimit;
         this.messageLimit = messageLimit;
-        this.creationDate = LocalDate.now().toString();;
-        this.openingDate = LocalDate.now().plusDays(timeLimitInDays).toString();
+        this.creationDate = LocalDate.now().toString();  // get Time at Jar Creation and Converts to String
+        this.openingDate = LocalDate.now().plusDays(timeLimitInDays).toString();  //adds days to current time for opening condition
         this.serverChannelID = serverChannelID;
     }
 

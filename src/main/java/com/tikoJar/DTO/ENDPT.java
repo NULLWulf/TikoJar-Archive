@@ -1,5 +1,9 @@
 package com.tikoJar.DTO;
-
+/*
+Author: Nathan Wolf
+Enumerated Endpoints, these are plugged into our specific MongoDB Api to indicate what kind of action
+is being taken within MongoDB
+ */
 public enum ENDPT {
 
     FIND("findOne"),
@@ -16,5 +20,5 @@ public enum ENDPT {
 
     public String get() {
         return endPoint;
-    }
+    }  // Gets enumerated endpoint
 }
