@@ -26,25 +26,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class QueryHandler {
-    private enum ENDPT {
-
-        FIND("findOne"),
-        INSERT("insertOne"),
-        UPDATE("updateOne"),
-        DELETE("deleteOne"),
-        AGG("aggregate"),
-        FINDALL("findAll");
-
-        private final String endPoint;
-
-        ENDPT(String endPoint) {
-            this.endPoint = endPoint;
-        }
-
-        public String get() {
-            return endPoint;
-        }  // Gets enumerated endpoint
-    }
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
 
