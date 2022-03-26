@@ -1,16 +1,6 @@
 package com.tikoJar.tests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tikoJar.DAO.Jar;
-import com.tikoJar.DAO.Message;
-import com.tikoJar.DAO.OpeningCondition;
-import okhttp3.*;
-
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-
-import static java.util.Objects.requireNonNull;
 
 public class testInserts {
 
