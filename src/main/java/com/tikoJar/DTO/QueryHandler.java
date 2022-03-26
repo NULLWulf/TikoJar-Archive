@@ -16,6 +16,7 @@ import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +28,7 @@ public class QueryHandler {
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
 
     private final MessageCreateEvent event;
+    DiscordApi api;
 
     private Long serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
@@ -50,9 +52,9 @@ public class QueryHandler {
 
     Jar currentJar;  // is deserialized to if function is called ot do so
 
-    public QueryHandler(MessageCreateEvent event) {
+    public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
-
+        this.api = api;
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
@@ -60,7 +62,7 @@ public class QueryHandler {
                 () -> LOGGER.warn("Error retrieving Server name"));
 
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
-                () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
+                () -> LOGGER.warn("Error retrieving Server ID from Java-cord API"));
 
         LOGGER.trace("""
                 Initializing QueryHandler for
@@ -148,11 +150,7 @@ public class QueryHandler {
             // TODO: else, messageDeleted = false;
 
         }
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
-
     }
 
     public void deleteJar(boolean isAdmin){
@@ -165,9 +163,6 @@ public class QueryHandler {
             // TODO: update jarDeleted boolean
 
         }
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
 
     }
