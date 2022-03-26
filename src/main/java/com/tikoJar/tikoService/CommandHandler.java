@@ -83,11 +83,7 @@ public class CommandHandler {
                                     }
 
                                 }
-                                try {
-                                    queryHandler.addMessage(message.toString());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                queryHandler.addMessage(message.toString());
 
                             } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                     MethodID.DELETEMESSAGE.getCommand())) {

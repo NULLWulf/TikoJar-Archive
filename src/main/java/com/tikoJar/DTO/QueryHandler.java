@@ -215,7 +215,6 @@ public class QueryHandler {
             e.printStackTrace();
         }
 
-
     }
 
     public Boolean checkIfJarExists() {
