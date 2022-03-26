@@ -45,7 +45,7 @@ public class QueryHandler {
     String postResponseBody;
     int responseCode;
 
-    Jar currentJar;
+    Jar currentJar;  // is deserialized to if function is called ot do so
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
