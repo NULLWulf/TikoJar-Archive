@@ -71,7 +71,7 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) {
-        responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
+        responseBuilder = new ResponseBuilder(event, api); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
                     Jar Exists for Server: %s : %s
@@ -262,21 +262,21 @@ public class QueryHandler {
         LOGGER.info("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event);
+        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.getHelpResponse();
     }
     public void hello(){
         LOGGER.info("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event);
+        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.helloResponse();
     }
     public void invalidCommand(){
         LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event);
+        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.invalidCommandResponse();
     }
 }
