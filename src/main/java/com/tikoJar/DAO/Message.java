@@ -1,12 +1,13 @@
 package com.tikoJar.DAO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.lang.invoke.StringConcatFactory;
 import java.time.LocalDate;
 import java.util.concurrent.BlockingDeque;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
 
     private String userID;
@@ -14,13 +15,14 @@ public class Message {
     private String messageContent;
     private String messageId;
 
-    public Message(){}
+    public Message(){}  // Empty Constructor necessary for Jackson
 
+    // Primary Constructor for Messages, called when addMessage is called
     public Message(String userID, String messageContent) {
         this.userID = userID;
-        this.datePosted = LocalDate.now().toString();
+        this.datePosted = LocalDate.now().toString(); // Gets server time and conver to String for easy database store
         this.messageContent = messageContent;
-        generateMessageId();
+        this.messageId = RandomStringUtils.randomAlphanumeric(10);  // Unique message id to perform things like deletes etc.
     }
 
     public String getUserID() {
@@ -50,8 +52,4 @@ public class Message {
     public String getMessageId() { return messageId;}
 
     public void setMessageId(String messageId) { this.messageId = messageId;}
-
-    public void generateMessageId(){
-        this.messageId = RandomStringUtils.randomAlphanumeric(10);
-    }
 }

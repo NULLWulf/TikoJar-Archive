@@ -276,12 +276,12 @@ public class QueryHandler {
 
     }
 
-    private void deserializeJarFromResponseBody() throws JsonProcessingException {
+    private Jar deserializeJarFromResponseBody() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
-        Jar jar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
+        return objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
                 stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
-                Jar.class);  // needed so Jackson understand how to map the class
+                Jar.class);
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) throws IOException {
