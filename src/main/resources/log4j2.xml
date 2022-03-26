@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Extra logging related to initialization of Log4j.
- Set to debug or trace if log4j initialization is failing. -->
-<Configuration status="warn">
+
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="default">[%d %p %c{1.}] %m%n</Property>
+        <Property name ="default_with_method">[%d %p %c{1}.%M] %m%n</Property>
+    </Properties>
+
     <Appenders>
-        <!-- Console appender configuration -->
-        <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout
-                    pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        <Console name="Console" target="SYSTEM_OUT" follow="false">
+            <PatternLayout pattern="${default_with_method}"/>
         </Console>
     </Appenders>
+
     <Loggers>
-        <!-- Root logger referring to console appender -->
-        <Root level="info" additivity="false">
-            <AppenderRef ref="console" />
+        <Root level="ALL">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Root>
+        <Logger name="trace" level="TRACE">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="debug" level="DEBUG">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="info" level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="warn" level="WARN">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="error" level="ERROR">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="fatal" level="FATAL">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
     </Loggers>
+
 </Configuration>

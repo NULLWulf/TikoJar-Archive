@@ -8,13 +8,12 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.security.cert.CertificateParsingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CommandHandler {
-
     private enum MethodID{
 
         COMMANDPREFIX("!tiko"),
@@ -40,11 +39,10 @@ public class CommandHandler {
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static final Logger LOGGER = LogManager.getLogger("CommandHandler.class");
 
-        Logger logger = Logger.getLogger(CommandHandler.class);
-        BasicConfigurator.configure();
-        logger.info("This is my first log4j's statement");
+
+    public static void main(String[] args) throws IOException {
 
         String token = TokenHandler.TOKEN;
 

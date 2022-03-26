@@ -11,6 +11,7 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.javac.Main;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
@@ -18,14 +19,12 @@ import com.tikoJar.tikoService.CommandHandler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class QueryHandler {
-
-    static Logger queryLogger = Logger.getLogger(String.valueOf(CommandHandler.class));
 
     private final MessageCreateEvent event;
 
@@ -244,6 +243,7 @@ public class QueryHandler {
                     Jar.class);  // stores it in currentJar object in class
         }catch (JsonProcessingException e){
             e.printStackTrace();
+
         }
     }
 
@@ -286,7 +286,7 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-        queryLogger.info("""
+        CommandHandler.LOGGER.info("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -294,7 +294,7 @@ public class QueryHandler {
     }
 
     public void hello(){
-        queryLogger.info("""
+        CommandHandler.LOGGER.info("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
@@ -302,7 +302,7 @@ public class QueryHandler {
     }
 
     public void invalidCommand(){
-        queryLogger.info("""
+        CommandHandler.LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
