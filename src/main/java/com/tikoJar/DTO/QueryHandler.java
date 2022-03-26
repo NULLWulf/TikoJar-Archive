@@ -14,14 +14,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
+import com.tikoJar.tikoService.CommandHandler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class QueryHandler {
+
+    static Logger queryLogger = Logger.getLogger(String.valueOf(CommandHandler.class));
 
     private final MessageCreateEvent event;
 
@@ -282,28 +286,25 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-        System.out.printf("""
-                    Help Function Called for: %s : %s
-                    
-                    """, serverName, serverId);
+        queryLogger.info("""
+                getHelp() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.getHelpResponse();
     }
 
     public void hello(){
-        System.out.printf("""
-                    Hello Function Called for: %s : %s
-                    
-                    """, serverName, serverId);
+        queryLogger.info("""
+                hello() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.helloResponse();
     }
 
     public void invalidCommand(){
-        System.out.printf("""
-                    Invalid Command Function Called for: %s : %s
-                    
-                    """, serverName, serverId);
+        queryLogger.info("""
+                invalidCommand() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.invalidCommandResponse();
     }

@@ -8,6 +8,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 public class CommandHandler {
 
@@ -37,6 +38,7 @@ public class CommandHandler {
     }
 
     public static void main(String[] args) throws IOException {
+
 
         String token = TokenHandler.TOKEN;
 
