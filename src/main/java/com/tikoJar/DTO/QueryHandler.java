@@ -45,7 +45,7 @@ public class QueryHandler {
     String postResponseBody;
     int responseCode;
 
-    Jar currentJar = new Jar();
+    Jar currentJar;
 
     public QueryHandler(MessageCreateEvent event){
         this.event = event;
@@ -133,7 +133,7 @@ public class QueryHandler {
 
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
-            // passing Admin function and currentJar for extrapolation in response builder
+            // passing Admin and currentJar for extrapolation in response builder
             // this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }
     }
@@ -177,7 +177,6 @@ public class QueryHandler {
     }
 
     public static void checkTimeLimits(){
-
     }
 
     public void processQuery(String query, String endPoint) throws IOException {
