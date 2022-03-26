@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.DTO.QueryHandler;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-
 import java.io.IOException;
+import java.security.cert.CertificateParsingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CommandHandler {
-
     private enum MethodID{
 
         COMMANDPREFIX("!tiko"),
@@ -36,7 +39,10 @@ public class CommandHandler {
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static final Logger LOGGER = LogManager.getLogger("CommandHandler.class");
+
+
+    public static void main(String[] args) {
 
         String token = TokenHandler.TOKEN;
 

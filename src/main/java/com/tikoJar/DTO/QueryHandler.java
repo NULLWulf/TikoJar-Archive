@@ -11,17 +11,22 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.javac.Main;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
+import com.tikoJar.tikoService.CommandHandler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.Objects;
 
 public class QueryHandler {
+
+    public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
 
     private final MessageCreateEvent event;
 
@@ -45,39 +50,37 @@ public class QueryHandler {
     String postResponseBody;
     int responseCode;
 
-    Jar currentJar;
+    Jar currentJar;  // is deserialized to if function is called ot do so
 
-    public QueryHandler(MessageCreateEvent event){
+    public QueryHandler(MessageCreateEvent event) {
         this.event = event;
 
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
-                () -> System.out.println("Error retrieving Server name")
-        );
+                () -> LOGGER.warn("Error retrieving Server name"));
+
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
-                () -> System.out.println("Error retrieving Server ID from Javacord API")
-        );
-        System.out.printf("""
-                    Initializing QueryHandler for
-                    %s : %s
-                    """, serverName, serverId);
+                () -> LOGGER.warn("Error retrieving Server ID from Javacord API"));
+
+        LOGGER.trace("""
+                Initializing QueryHandler for
+                %s : %s
+                """.formatted(serverName, serverId));
     }
 
     public void addMessage(String message) {
         responseBuilder = new ResponseBuilder(event); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            System.out.printf("""
+            LOGGER.info("""
                     Jar Exists for Server: %s : %s
-                    Checking if Message Added...
-                    """, serverName, serverId);
+                    """.formatted(serverName, serverId));
             if(checkIfMessageAdded(
-                    new Message(event.getMessageAuthor().getDisplayName().toString(), message)))
-                System.out.printf("""
-                    Message Added for: %s : %s
-                    Checking if Message Added...
-                    """, serverName, serverId);
+                    new Message(event.getMessageAuthor().getIdAsString(), message)))
+                LOGGER.info("""
+                    Checking if Message Added: %s : %s
+                    """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
@@ -86,10 +89,9 @@ public class QueryHandler {
                 // this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
-            System.out.printf("""
-                    Message not Added for
-                    %s : %s
-                    """, serverName, serverId);
+            LOGGER.info("""
+                    Message not Added for %s : %s
+                    """.formatted(serverName, serverId));
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
 
@@ -199,8 +201,7 @@ public class QueryHandler {
             responseCode = response.code();  // Stores response code as an int
 
             response.close();  // Close the client
-            System.out.printf("""
-        
+            LOGGER.debug("""
         ----HTTP Request Results----:
             ::  Sent Query ::
         %s
@@ -210,9 +211,9 @@ public class QueryHandler {
         Status Code: %d
         Response Body:
         %s
-        """, query,url,responseCode,postResponseBody);
+        """.formatted(query,url,responseCode,postResponseBody));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn(e.getMessage());
         }
 
     }
@@ -239,7 +240,7 @@ public class QueryHandler {
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
         }catch (JsonProcessingException e){
-            e.printStackTrace();
+            LOGGER.warn(e.getMessage());
         }
     }
 
@@ -282,27 +283,27 @@ public class QueryHandler {
     }
 
     public void getHelp(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        LOGGER.info("""
+                getHelp() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.getHelpResponse();
-
     }
 
     public void hello(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        LOGGER.info("""
+                hello() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.helloResponse();
-
     }
 
     public void invalidCommand(){
-
-        this.responseBuilder = new ResponseBuilder(null, event);
-
+        LOGGER.info("""
+                invalidCommand() Function Called for: %s : %s
+                """.formatted(serverId, serverName));
+        this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.invalidCommandResponse();
-
     }
 
 }
