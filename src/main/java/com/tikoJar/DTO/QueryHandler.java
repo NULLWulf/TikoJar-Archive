@@ -11,11 +11,9 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.tools.javac.Main;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.tests.JSON_Handler;
-import com.tikoJar.tikoService.CommandHandler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
 import org.javacord.api.event.message.MessageCreateEvent;
