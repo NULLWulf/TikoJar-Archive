@@ -57,7 +57,7 @@ public class CommandHandler {
                         boolean isAdmin = event.getMessageAuthor().isServerAdmin();
 
                         // Instantiate QueryHandler for method calls
-                        QueryHandler queryHandler = new QueryHandler(event);
+                        QueryHandler queryHandler = new QueryHandler(event, api);
 
                         // Determine number of words contained in user message
                         if (messageContent.length >= 3) {
