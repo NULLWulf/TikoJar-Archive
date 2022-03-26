@@ -86,7 +86,7 @@ public class QueryHandler {
             if(checkMessageLimit()){
                 // currentJar gets sent to ResponseBuilder
                 // currentJar sent to response builder message limit event
-                // this.responseBuilder.messageLimitEvent(currentJar);
+                 this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
             LOGGER.info("""
@@ -109,16 +109,9 @@ public class QueryHandler {
 
                     // TODO: Store jar with message limit in database
 
-                    // SUGGESTED METHOD:
-                    // LocalDate creationDate = LocalDate.now();
-
                 } else {
 
                     // TODO: Store jar with time limit in database
-
-                    // SUGGESTED METHODS:
-                    // LocalDate creationDate = LocalDate.now();
-                    // LocalDate openingDate = creationDate.plusDays(timeLimitInDays);
 
                 }
 
@@ -136,7 +129,7 @@ public class QueryHandler {
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-            // this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+             this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }
     }
 
@@ -208,21 +201,17 @@ public class QueryHandler {
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
         }
-
     }
 
     public Boolean checkIfJarExists() {
-
         String checkJarExistsQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
-
     }
 
     private void deserializeJarFromResponseBody() {
@@ -239,7 +228,6 @@ public class QueryHandler {
 
     public Boolean checkIfMessageAdded(Message addMessage) {
         jsonHelper = new JSON_Handler();   // initialize JSON helper
-
         // Block quotes query, is a NoSql Query that adds a message to the message array
         String addMessageQuery = """
                 {"collection":"Jars",
@@ -251,7 +239,6 @@ public class QueryHandler {
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
-
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
@@ -261,20 +248,16 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
-
         String createJarQuery = """
-                {
-                    "collection":"Jars",
+                {"collection":"Jars",
                     "database":"TikoJarTest",
                     "dataSource":"PositivityJar",
                     "filter": { "serverID": "%s" },
-                    "document": %s
-                }
+                    "document": %s}
                 """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
-
     public void getHelp(){
         LOGGER.info("""
                 getHelp() Function Called for: %s : %s
@@ -282,7 +265,6 @@ public class QueryHandler {
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.getHelpResponse();
     }
-
     public void hello(){
         LOGGER.info("""
                 hello() Function Called for: %s : %s
@@ -290,7 +272,6 @@ public class QueryHandler {
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.helloResponse();
     }
-
     public void invalidCommand(){
         LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
@@ -298,7 +279,6 @@ public class QueryHandler {
         this.responseBuilder = new ResponseBuilder(event);
         responseBuilder.invalidCommandResponse();
     }
-
 }
 
 
