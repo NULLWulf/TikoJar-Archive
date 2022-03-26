@@ -95,7 +95,7 @@ public class QueryHandler {
 
     }
 
-    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays) throws IOException {
+    public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
 
         if(validSyntax && isAdmin){
 
