@@ -2,7 +2,6 @@ package com.tikoJar.DTO;
 
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
-import jakarta.json.JsonObject;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -16,20 +15,10 @@ public class ResponseBuilder {
     private Jar jar;
     private DiscordApi api;
 
-    public ResponseBuilder(MessageCreateEvent event){
-        this.event = event;
-    }
-
     public ResponseBuilder(MessageCreateEvent event, DiscordApi api){
 
         this.event = event;
         this.api = api;
-
-    }
-
-    public void deserializeResponse(JsonObject responseObject){
-
-        // TODO: deserialize responseObject
 
     }
 
@@ -105,17 +94,36 @@ public class ResponseBuilder {
 
                 }
 
-                for (int i = 0; i < messages.size(); i++){
+                for (Message message : messages) {
 
-                    if (isAdmin || messages.get(i).getUserID().equals(userID)){
+                    if (isAdmin || message.getUserID().equals(userID)) {
 
+                        String date = message.getDatePosted();
+                        String messageID = message.getMessageId();
+                        String messageContent = message.getMessageContent();
 
-                        String date = messages.get(i).getDatePosted();
-                        // String author = DiscordApi.getUser messages.get(i).getUserID()
+                        // TODO: verify that this casting is not causing an issue
+                        User user = (User) api.getUserById(message.getUserID());
+
+                        String nickname = "user";
+
+                        if (user != null) {
+
+                            nickname = user.getNickname(server).orElse(user.getDisplayName(server));
+
+                        }
+
+                        responseString
+                                .append("Message submitted by ").append(nickname).append(" on ").append(date)
+                                .append(" (message ID #").append(messageID).append("):\n").append(messageContent)
+                                .append("\n\n")
+                        ;
 
                     }
 
                 }
+
+                event.getChannel().sendMessage(responseString.toString());
 
             } else {
 
@@ -188,7 +196,7 @@ public class ResponseBuilder {
 
     }
 
-    public void messageLimitEvent(){
+    public void messageLimitEvent(Jar jar){
 
         // TODO: format and deliver messages
 
