@@ -102,7 +102,6 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-
                     createJarQuery(new Jar(this.serverId,
                             new OpeningCondition(true, messageLimit, 0 , event.getChannel().getIdAsString())));
                 } else
@@ -175,7 +174,7 @@ public class QueryHandler {
 
     }
 
-    public void processQuery(String query, String endPoint) {
+    public String processQuery(String query, String endPoint) {
         try {
             client = new OkHttpClient().newBuilder().build();
             mediaType = MediaType.parse("application/json");
@@ -190,23 +189,12 @@ public class QueryHandler {
                     .build();
 
             response = client.newCall(request).execute();  // execute the request
-            postResponseBody = Objects.requireNonNull(response.body()).string(); // stores response body as a String
-            responseCode = response.code();  // Stores response code as an int
-
-            response.close();  // Close the client
-            LOGGER.debug("""
-        ----HTTP Request Results----:
-            ::  Sent Query ::
-        %s
-            ::     URL     ::
-        %s
-            ::  Response   ::
-        Status Code: %d
-        Response Body:
-        %s
-        """.formatted(query,url,responseCode,postResponseBody));
+            return Objects.requireNonNull(response.body()).string();
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
+            return "{\"document\":null}";
+        } finally {
+            response.close();  // Close the client
         }
     }
 
@@ -217,10 +205,9 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        String match = """
-                {"document":null}""";
-        return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
+        String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+
     }
 
     public void deleteJarQuery() {
