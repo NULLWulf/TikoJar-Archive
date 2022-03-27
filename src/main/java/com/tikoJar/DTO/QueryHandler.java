@@ -106,7 +106,7 @@ public class QueryHandler {
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
             }else{
-                responseBuilder.createJarResponse(validSyntax, isAdmin,true);
+                responseBuilder.createJarResponse(true, true,true);
             }
         }else{
             responseBuilder.createJarResponse(validSyntax, isAdmin, false);
@@ -143,8 +143,7 @@ public class QueryHandler {
             if(checkIfJarExists()){
                 deleteJarQuery();
             }else{
-                responseBuilder.deleteJarResponse(isAdmin, false);
-                LOGGER.log(Level.valueOf("No Jar found for: %s"), serverId);
+                responseBuilder.deleteJarResponse(true, false);
             }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
