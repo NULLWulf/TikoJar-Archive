@@ -164,8 +164,8 @@ public class QueryHandler {
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
-                "filter": { "openingCondition.hasMessageLimit": { $eq : true },
-                            "openingCondition.hasMessageLimit": { $eq : "%s }}}
+                "filter": { "openingCondition.hasMessageLimit": { $eq : false },
+                            "openingCondition.creationDate": { $eq : "%s" }}}
                 """.formatted(LocalDate.now().toString());
         processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
 
