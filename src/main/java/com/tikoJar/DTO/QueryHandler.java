@@ -78,6 +78,7 @@ public class QueryHandler {
                 """.formatted(serverName, serverId));
     }
 
+
     public void addMessage(String message) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
@@ -142,6 +143,7 @@ public class QueryHandler {
 
         }
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
+
     }
 
     public void deleteJar(boolean isAdmin){
