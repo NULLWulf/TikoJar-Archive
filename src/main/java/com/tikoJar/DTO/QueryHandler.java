@@ -29,7 +29,6 @@ import java.util.Objects;
 public class QueryHandler {
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
-
     private final MessageCreateEvent event;
     DiscordApi api;
 
@@ -37,21 +36,11 @@ public class QueryHandler {
     String serverName; // serverNames are string
 
     ResponseBuilder responseBuilder;  // instantiated based on need
-
     // JSON Helper functions to assist with serialization and deserialization of queries
     JSON_Handler jsonHelper;
 
-    // OKHTTP3 Library Objects, they are initialized in the process query function
-    // but declared within the class for each query method to access relevant data
-    OkHttpClient client;
-    MediaType mediaType;
-    RequestBody body;
-    Request request;
-    Response response;
-
     // Stores variables from response from HTTP client, client is closed after call so values in Response are volatile
     String postResponseBody;
-    int responseCode;
 
     Jar currentJar;  // is deserialized to if function is called ot do so
     ArrayList<Jar> currentJars;
@@ -68,6 +57,9 @@ public class QueryHandler {
 
         event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getIdAsString(),
                 () -> LOGGER.warn("Error retrieving Server ID from Java-cord API"));
+
+        event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
+                () -> LOGGER.warn("Error retrieving Server name"));
 
         LOGGER.trace("""
                 Initializing QueryHandler for
@@ -87,7 +79,6 @@ public class QueryHandler {
                     Checking if Message Added: %s
                     """.formatted(serverId));
             responseBuilder.addMessageResponse(true);  // Calls message added true response
-            deserializeJarFromResponseBody(); // Deserializes jar fromm ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
                  responseBuilder.messageLimitEvent(currentJar);
             }
@@ -121,7 +112,6 @@ public class QueryHandler {
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
-            deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
@@ -175,26 +165,25 @@ public class QueryHandler {
 
     public String processQuery(String query, String endPoint) {
         try {
-            client = new OkHttpClient().newBuilder().build();
-            mediaType = MediaType.parse("application/json");
-            body = RequestBody.create(query, mediaType);
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(query, mediaType);
             String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
-            request = new Request.Builder()
+            Request request = new Request.Builder()
                     .url(url)
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Access-Control-Request-Headers", "*")
                     .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                     .build();
-            response = client.newCall(request).execute();  // execute the request
+            Response response = client.newCall(request).execute();  // execute the request
             LOGGER.debug("Process Query for Endpoint %s Called for %s %s - Query: %s".formatted(endPoint, serverName, serverId, query));
-            return Objects.requireNonNull(response.body()).string();
+            String tempResponse = Objects.requireNonNull(response.body()).string();
+            response.close();
+            return tempResponse;
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
             return defaultEmpty;
-        } finally {
-            LOGGER.debug("Query Handler Instance Client Closing");
-            response.close();  // Close the client
         }
     }
 
