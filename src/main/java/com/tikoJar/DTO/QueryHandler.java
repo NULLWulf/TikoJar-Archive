@@ -17,6 +17,7 @@ import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
@@ -133,7 +134,9 @@ public class QueryHandler {
             // passing Admin function and currentJar for extrapolation in response builder
             jsonHelper = new JSON_Handler();
             LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
-             this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+            this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+        }{
+            LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
         }
     }
 

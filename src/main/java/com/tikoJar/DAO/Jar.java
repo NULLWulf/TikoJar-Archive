@@ -24,7 +24,7 @@ public class Jar {
         this.serverName = serverName;
         this.serverID = serverID;
         this.openingCondition = openingCondition; // nest opening condiiton inside Jar constructor
-        this.messages = null;
+        this.messages = new ArrayList<>();
         this.hashCode =  RandomStringUtils.randomAlphanumeric(20);  // hashCode, for possible additional admin related features
         // such as website access etc.
     }
