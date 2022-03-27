@@ -99,30 +99,22 @@ public class QueryHandler {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
-
         if(validSyntax && isAdmin){
-
-            // TODO: check if server has jar. If it does, set hasJar to true.
-
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else
-
                 {
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
-
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
         }else{
             responseBuilder.createJarResponse(validSyntax, isAdmin, false);
         }
-
     }
 
     public void viewMessages(boolean isAdmin) {
