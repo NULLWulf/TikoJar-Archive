@@ -126,7 +126,6 @@ public class QueryHandler {
     }
 
     public void viewMessages(boolean isAdmin) {
-
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
@@ -156,11 +155,10 @@ public class QueryHandler {
                 deleteJarQuery();
             }else{
                 responseBuilder.deleteJarResponse(isAdmin, false);
+                LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
             }
-
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
-
     }
 
     public boolean checkMessageLimit(){
@@ -171,7 +169,6 @@ public class QueryHandler {
     }
 
     public void processQuery(String query, String endPoint) {
-
         try {
             client = new OkHttpClient().newBuilder().build();
             mediaType = MediaType.parse("application/json");
@@ -219,7 +216,7 @@ public class QueryHandler {
         return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
     }
 
-    public Boolean deleteJarQuery() {
+    public void deleteJarQuery() {
         String checkJarExistsQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
@@ -227,9 +224,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
-        String match = """
-                {"document":null}""";
-        return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
+        LOGGER.log(Level.valueOf("Delete Jar Query Processed for: %s : %s"), serverName,serverId);
     }
 
     private void deserializeJarFromResponseBody() {
