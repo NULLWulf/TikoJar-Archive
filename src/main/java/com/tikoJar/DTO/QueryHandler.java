@@ -150,7 +150,6 @@ public class QueryHandler {
     }
 
     public void checkTimeLimits(){
-
         String checkAndReturnExpired = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
@@ -158,8 +157,8 @@ public class QueryHandler {
                 "filter": { "openingCondition.hasMessageLimit": { $eq : false },
                             "openingCondition.creationDate": { $eq : "%s" }}}
                 """.formatted(LocalDate.now().toString());
-        processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
-
+        String postResponse = processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
+        LOGGER.debug("-- Check Time Limits Post Response --\n%s".formatted(postResponse));
     }
 
     public String processQuery(String query, String endPoint) {
@@ -176,7 +175,7 @@ public class QueryHandler {
                     .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                     .build();
             Response response = client.newCall(request).execute();  // execute the request
-            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - Query: %s".formatted(endPoint, serverName, serverId, query));
+            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - \nQuery: \n%s".formatted(endPoint, serverName, serverId, query));
             String tempResponse = Objects.requireNonNull(response.body()).string();
             response.close();
             return tempResponse;
@@ -195,7 +194,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        LOGGER.debug("Jar Exists Post Response %s : ".formatted(postResponse));
+        LOGGER.debug("-- Jar Exists Post Response --\n%s".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
@@ -206,7 +205,8 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
     private void deserializeJarFromResponseBody(String responseBody) {
@@ -237,7 +237,7 @@ public class QueryHandler {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, new JSON_Handler().getObjAsJSONString(addMessage).stripIndent());  // converts newMessage to JSON format
         String postResponse = processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
-        LOGGER.debug("Check Message Addded Post Response : %s".formatted(postResponse));
+        LOGGER.debug("-- Check if Message Added Post Response --\n%s".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
@@ -254,8 +254,8 @@ public class QueryHandler {
                     "dataSource":"PositivityJar",
                     "document": %s}
                 """.formatted(new JSON_Handler().getObjAsJSONString(jar).stripIndent());
-
-        processQuery(createJarQuery,ENDPT.INSERT.get());
+        String postResponse = processQuery(createJarQuery,ENDPT.INSERT.get());
+        LOGGER.debug("-- Check if Jar Created Post Response --\n%s".formatted(postResponse));
     }
     public void getHelp(){
         LOGGER.info("""
