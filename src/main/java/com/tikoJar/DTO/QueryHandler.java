@@ -119,27 +119,20 @@ public class QueryHandler {
     }
 
     public void deleteMessage(boolean includedMessageID, String messageID){
-
         boolean messageDeleted = true;
-
         if(includedMessageID){
-
             // TODO: delete message if it exists
-
             // TODO: else, messageDeleted = false;
-
         }
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
-
     }
 
-    public void deleteJar(boolean isAdmin){
-        boolean jarDeleted = true;
+    public void deleteJar(boolean isAdmin){  // Completed finished testing and working
+        boolean jarDeleted = false;
         if(isAdmin){
             if(checkIfJarExists()){
                 deleteJarQuery();
-            }else{
-                responseBuilder.deleteJarResponse(true, false);
+                jarDeleted = true;
             }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
@@ -216,8 +209,6 @@ public class QueryHandler {
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
-            LOGGER.debug(new JSON_Handler().getObjAsJSONString(currentJar));
-            LOGGER.debug(currentJar.getMessages().size());
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
@@ -246,7 +237,6 @@ public class QueryHandler {
         // should be easier
         return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
     }
-
     public void createJarQuery(Jar jar) {
         String createJarQuery = """
                 {"collection":"Jars",
