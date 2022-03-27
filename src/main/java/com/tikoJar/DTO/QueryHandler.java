@@ -23,6 +23,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -157,7 +158,20 @@ public class QueryHandler {
         return currentJar.getOpeningCondition().getMessageLimit() == currentJar.getMessages().size();
     }
 
-    public static void checkTimeLimits(){
+    public void checkTimeLimits(){
+
+        String checkAndReturnExpired = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "openingCondition.hasMessageLimit": { $eq : true },
+                            "openingCondition.hasMessageLimit": { $eq : "%s }}}
+                """.formatted(LocalDate.now().toString());
+        processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
+
+        String match = """
+                {"document":null}""";
+
     }
 
     public void processQuery(String query, String endPoint) {

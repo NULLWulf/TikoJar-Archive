@@ -16,8 +16,6 @@ public class TimedEventHandler {
 
             public void run() {
 
-                QueryHandler.checkTimeLimits();
-
             }
 
         };
