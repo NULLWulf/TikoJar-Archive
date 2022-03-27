@@ -262,21 +262,18 @@ public class QueryHandler {
         LOGGER.info("""
                 getHelp() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.getHelpResponse();
     }
     public void hello(){
         LOGGER.info("""
                 hello() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.helloResponse();
     }
     public void invalidCommand(){
         LOGGER.info("""
                 invalidCommand() Function Called for: %s : %s
                 """.formatted(serverId, serverName));
-        this.responseBuilder = new ResponseBuilder(event, api);
         responseBuilder.invalidCommandResponse();
     }
 }
