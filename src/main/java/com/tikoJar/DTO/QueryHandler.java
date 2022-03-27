@@ -24,6 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -54,6 +56,7 @@ public class QueryHandler {
     int responseCode;
 
     Jar currentJar;  // is deserialized to if function is called ot do so
+    ArrayList<Jar> currentJars;
 
     public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
@@ -235,10 +238,10 @@ public class QueryHandler {
 
     private void deserializeJarFromResponseBody() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
             jsonHelper = new JSON_Handler();
-            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
-            this.currentJar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
+            this.currentJar = new ObjectMapper()
+                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
             LOGGER.debug(jsonHelper.getObjAsJSONString(this.currentJar));
@@ -246,6 +249,9 @@ public class QueryHandler {
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
+    }
+
+    private void deserializeJarsFromResponseBody() {
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) {
