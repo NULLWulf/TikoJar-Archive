@@ -87,8 +87,6 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
-                // currentJar gets sent to ResponseBuilder
-                // currentJar sent to response builder message limit event
                  this.responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
@@ -132,8 +130,6 @@ public class QueryHandler {
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-            jsonHelper = new JSON_Handler();
-            LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
             this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
             LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
@@ -154,13 +150,13 @@ public class QueryHandler {
     }
 
     public void deleteJar(boolean isAdmin){
-
         boolean jarDeleted = true;
-
         if(isAdmin){
-
-            // TODO: delete jar if it exists
-            // TODO: update jarDeleted boolean
+            if(checkIfJarExists()){
+                deleteJarQuery();
+            }else{
+                responseBuilder.deleteJarResponse(isAdmin, false);
+            }
 
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
@@ -223,13 +219,29 @@ public class QueryHandler {
         return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
     }
 
+    public Boolean deleteJarQuery() {
+        String checkJarExistsQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}
+                """.formatted(serverId);
+        processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        String match = """
+                {"document":null}""";
+        return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
+    }
+
     private void deserializeJarFromResponseBody() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();  // Instantiate JSON Object Mapper
+            jsonHelper = new JSON_Handler();
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);//Ignores properties it does recognize, value swill be null
             this.currentJar = objectMapper.readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
+            LOGGER.debug(jsonHelper.getObjAsJSONString(this.currentJar));
+            LOGGER.debug(this.currentJar.getMessages().size());
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
