@@ -31,7 +31,7 @@ public class QueryHandler {
     private final MessageCreateEvent event;
     DiscordApi api;
 
-    private Long serverId;  // serverID are Long data types
+    private String serverId;  // serverID are Long data types
     private String serverName; // serverNames are string
 
     ResponseBuilder responseBuilder;  // instantiated based on need
@@ -64,7 +64,7 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
                 () -> LOGGER.warn("Error retrieving Server name"));
 
-        event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getId(),
+        event.getServer().ifPresentOrElse(sv -> this.serverId = sv.getIdAsString(),
                 () -> LOGGER.warn("Error retrieving Server ID from Java-cord API"));
 
         LOGGER.trace("""
@@ -105,16 +105,18 @@ public class QueryHandler {
 
             // TODO: check if server has jar. If it does, set hasJar to true.
 
-            if (checkIfJarExists()){
-
-
+            if (!checkIfJarExists()){
                 if (messageLimit != 0){
+
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
-                } else {
+                } else
+
+                {
                     createJarQuery(new Jar(this.serverId, this.serverName,
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
+
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
@@ -211,7 +213,9 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+        String match = """
+                {"document":null}""";
+        return !(Objects.equals(postResponseBody.trim().stripIndent(), match.trim()));
     }
 
     private void deserializeJarFromResponseBody() {
