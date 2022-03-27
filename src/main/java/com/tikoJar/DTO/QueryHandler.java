@@ -33,8 +33,8 @@ public class QueryHandler {
     private final MessageCreateEvent event;
     DiscordApi api;
 
-    private String serverId;  // serverID are Long data types
-    private String serverName; // serverNames are string
+    String serverId;  // serverID are Long data types
+    String serverName; // serverNames are string
 
     ResponseBuilder responseBuilder;  // instantiated based on need
 
@@ -124,7 +124,7 @@ public class QueryHandler {
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
-            this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+            responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
             LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
         }
@@ -150,14 +150,14 @@ public class QueryHandler {
             if(checkIfJarExists()){
                 deleteJarQuery();
             }else{
-                responseBuilder.deleteJarResponse(isAdmin, false);
+                responseBuilder.deleteJarResponse(true, false);
                 LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
             }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
     }
 
-    public boolean checkMessageLimit(){
+    public boolean checkMessageLimit(){  // Checks Message Limit store in Opening Condition with Size
         return currentJar.getOpeningCondition().getMessageLimit() == currentJar.getMessages().size();
     }
 
