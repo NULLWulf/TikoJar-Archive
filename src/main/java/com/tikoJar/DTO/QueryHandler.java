@@ -105,7 +105,7 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-                    createJarQuery(new Jar(serverId, .serverName,
+                    createJarQuery(new Jar(serverId, serverName,
                             new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else
                 {
@@ -238,13 +238,12 @@ public class QueryHandler {
 
     private void deserializeJarFromResponseBody() {
         try {
-            jsonHelper = new JSON_Handler();
             currentJar = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
-            LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
+            LOGGER.debug(new JSON_Handler().getObjAsJSONString(currentJar));
             LOGGER.debug(currentJar.getMessages().size());
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
@@ -255,7 +254,6 @@ public class QueryHandler {
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) {
-        jsonHelper = new JSON_Handler();   // initialize JSON helper
         // Block quotes query, is a NoSql Query that adds a message to the message array
         String addMessageQuery = """
                 {"collection":"Jars",
@@ -264,7 +262,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" },
                 "update": {
                     "$push": {"messages": %s}}}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(addMessage)).stripIndent();  // converts newMessage to JSON format
+                """.formatted(serverId, new JSON_Handler().getObjAsJSONString(addMessage).stripIndent());  // converts newMessage to JSON format
         processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
         return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
     }
@@ -276,13 +274,12 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
-        jsonHelper = new JSON_Handler();
         String createJarQuery = """
                 {"collection":"Jars",
                     "database":"TikoJarTest",
                     "dataSource":"PositivityJar",
                     "document": %s}
-                """.formatted(jsonHelper.getObjAsJSONString(jar).stripIndent());
+                """.formatted(new JSON_Handler().getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
