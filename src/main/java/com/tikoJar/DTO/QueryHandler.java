@@ -61,10 +61,9 @@ public class QueryHandler {
         event.getServer().ifPresentOrElse(sv -> this.serverName = sv.getName(),
                 () -> LOGGER.warn("Error retrieving Server name"));
 
-        LOGGER.trace("""
-                Initializing QueryHandler for
-                %s
-                """.formatted(serverId));
+        LOGGER.debug("""
+                Initializing QueryHandler for %s : %s "
+                """.formatted(serverId, serverName));
     }
 
 
@@ -188,7 +187,7 @@ public class QueryHandler {
     }
 
     public Boolean checkIfJarExists() {
-        LOGGER.trace("Checking if Jar Exists for %s %s".formatted(serverName, serverId));
+        LOGGER.debug("Checking if Jar Exists for %s %s".formatted(serverName, serverId));
         String checkJarExistsQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
@@ -196,7 +195,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        LOGGER.trace("Jar Exists Post Response %s : ".formatted(postResponse));
+        LOGGER.debug("Jar Exists Post Response %s : ".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
@@ -238,7 +237,7 @@ public class QueryHandler {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, new JSON_Handler().getObjAsJSONString(addMessage).stripIndent());  // converts newMessage to JSON format
         String postResponse = processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
-        LOGGER.trace("Check Message Addded Post Response : %s".formatted(postResponse));
+        LOGGER.debug("Check Message Addded Post Response : %s".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
