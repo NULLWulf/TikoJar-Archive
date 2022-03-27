@@ -131,6 +131,8 @@ public class QueryHandler {
         if(checkIfJarExists()){
             deserializeJarFromResponseBody();
             // passing Admin function and currentJar for extrapolation in response builder
+            jsonHelper = new JSON_Handler();
+            LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
              this.responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }
     }
