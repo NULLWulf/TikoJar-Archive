@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
+import com.tikoJar.DAO.OpeningCondition;
 import com.tikoJar.tests.JSON_Handler;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,8 @@ public class QueryHandler {
     public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
         this.api = api;
+        this.responseBuilder = new ResponseBuilder(this.event, this.api);
+
         // Anytime query handler called, since it is within the context of
         // an individual discord server, constructors retrieves serverId
         // and serverName, may change, in actuality serverId may be all that is required here
@@ -71,7 +74,6 @@ public class QueryHandler {
     }
 
     public void addMessage(String message) {
-        responseBuilder = new ResponseBuilder(event, api); // Always a response of some kind, thus initialize
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
             LOGGER.info("""
                     Jar Exists for Server: %s : %s
@@ -107,14 +109,9 @@ public class QueryHandler {
 
                 if (messageLimit != 0){
 
-                    // TODO: Store jar with message limit in database
-
                 } else {
 
-                    // TODO: Store jar with time limit in database
-
                 }
-
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
             }
