@@ -187,16 +187,19 @@ public class QueryHandler {
                     .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                     .build();
             response = client.newCall(request).execute();  // execute the request
+            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - Query: %s".formatted(endPoint, serverName, serverId, query));
             return Objects.requireNonNull(response.body()).string();
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
             return defaultEmpty;
         } finally {
+            LOGGER.debug("Query Handler Instance Client Closing");
             response.close();  // Close the client
         }
     }
 
     public Boolean checkIfJarExists() {
+        LOGGER.trace("Checking if Jar Exists for %s %s".formatted(serverName, serverId));
         String checkJarExistsQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
@@ -204,6 +207,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+        LOGGER.trace("Jar Exists Post Response %s : ".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
@@ -215,10 +219,9 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
-        LOGGER.log(Level.valueOf("Delete Jar Query Processed for: %s"), serverId);
     }
 
-    private void deserializeJarFromResponseBody() {
+    private void deserializeJarFromResponseBody(String responseBody) {
         try {
             currentJar = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -245,8 +248,9 @@ public class QueryHandler {
                 "update": {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, new JSON_Handler().getObjAsJSONString(addMessage).stripIndent());  // converts newMessage to JSON format
-        processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
-        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
+        String postResponse = processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+        LOGGER.trace("Check Message Addded Post Response : %s".formatted(postResponse));
+        return !Objects.equals(postResponse, defaultEmpty);
     }
 
     public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
