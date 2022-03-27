@@ -11,7 +11,6 @@ import org.bson.types.ObjectId;
 public class Jar {
 
     String serverID;
-    private String serverName;
     private OpeningCondition openingCondition;
     private String hashCode;
     private ArrayList<Message> messages;
@@ -20,18 +19,13 @@ public class Jar {
 
     // Primary Constructor, createJar should use this, with OpeningCondition nested inside of Constructor
     // messages set to null to ensure array initialized in database
-    public Jar(String serverID, String serverName, OpeningCondition openingCondition) {
-        this.serverName = serverName;
+    public Jar(String serverID, OpeningCondition openingCondition) {
         this.serverID = serverID;
         this.openingCondition = openingCondition; // nest opening condiiton inside Jar constructor
         this.messages = new ArrayList<>();
         this.hashCode =  RandomStringUtils.randomAlphanumeric(20);  // hashCode, for possible additional admin related features
         // such as website access etc.
     }
-
-    public String getServerName() {return serverName;}
-
-    public void setServerName(String serverName) {this.serverName = serverName;}
 
     public String getServerID() {
         return serverID;
