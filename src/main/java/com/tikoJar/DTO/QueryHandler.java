@@ -150,10 +150,6 @@ public class QueryHandler {
                 deleteJarQuery();
             }else{
                 responseBuilder.deleteJarResponse(true, false);
-<<<<<<< HEAD
-                LOGGER.log(Level.valueOf("No Jar found for: %s : %s"), serverName,serverId);
-=======
->>>>>>> 78b200fff8f00dafcff5bbaa6ea8ea85afeefa38
             }
         }
         responseBuilder.deleteJarResponse(isAdmin, jarDeleted);
