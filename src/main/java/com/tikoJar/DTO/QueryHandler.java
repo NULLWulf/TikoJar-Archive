@@ -105,12 +105,15 @@ public class QueryHandler {
 
             // TODO: check if server has jar. If it does, set hasJar to true.
 
-            if (!checkIfJarExists()){
+            if (checkIfJarExists()){
+
 
                 if (messageLimit != 0){
-
+                    createJarQuery(new Jar(this.serverId, this.serverName,
+                            new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else {
-
+                    createJarQuery(new Jar(this.serverId, this.serverName,
+                            new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
             }else{
                 responseBuilder.createJarResponse(validSyntax, isAdmin,true);
@@ -245,13 +248,13 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
+        this.jsonHelper = new JSON_Handler();
         String createJarQuery = """
                 {"collection":"Jars",
                     "database":"TikoJarTest",
                     "dataSource":"PositivityJar",
-                    "filter": { "serverID": "%s" },
                     "document": %s}
-                """.formatted(serverId, jsonHelper.getObjAsJSONString(jar).stripIndent());
+                """.formatted(jsonHelper.getObjAsJSONString(jar).stripIndent());
 
         processQuery(createJarQuery,ENDPT.INSERT.get());
     }
