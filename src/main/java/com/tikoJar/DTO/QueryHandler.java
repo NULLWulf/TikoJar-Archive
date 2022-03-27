@@ -90,7 +90,7 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             deserializeJarFromResponseBody(); // deserializes jar form ResponseBody to prepare for checkingMessage Limits
             if(checkMessageLimit()){
-                 this.responseBuilder.messageLimitEvent(currentJar);
+                 responseBuilder.messageLimitEvent(currentJar);
             }
         }else{
             LOGGER.info("""
@@ -105,11 +105,11 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-                    createJarQuery(new Jar(this.serverId, this.serverName,
+                    createJarQuery(new Jar(serverId, .serverName,
                             new OpeningCondition(true, messageLimit, 0, event.getChannel().getIdAsString())));
                 } else
                 {
-                    createJarQuery(new Jar(this.serverId, this.serverName,
+                    createJarQuery(new Jar(serverId, serverName,
                             new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
                 }
             }else{
@@ -239,13 +239,13 @@ public class QueryHandler {
     private void deserializeJarFromResponseBody() {
         try {
             jsonHelper = new JSON_Handler();
-            this.currentJar = new ObjectMapper()
+            currentJar = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
                     stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
-            LOGGER.debug(jsonHelper.getObjAsJSONString(this.currentJar));
-            LOGGER.debug(this.currentJar.getMessages().size());
+            LOGGER.debug(jsonHelper.getObjAsJSONString(currentJar));
+            LOGGER.debug(currentJar.getMessages().size());
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
@@ -276,7 +276,7 @@ public class QueryHandler {
     }
 
     public void createJarQuery(Jar jar) {
-        this.jsonHelper = new JSON_Handler();
+        jsonHelper = new JSON_Handler();
         String createJarQuery = """
                 {"collection":"Jars",
                     "database":"TikoJarTest",
