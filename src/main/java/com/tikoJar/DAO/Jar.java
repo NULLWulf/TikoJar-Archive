@@ -1,11 +1,8 @@
 package com.tikoJar.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import java.util.ArrayList;
-import org.bson.types.ObjectId;
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jar {

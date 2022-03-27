@@ -56,6 +56,8 @@ public class QueryHandler {
     Jar currentJar;  // is deserialized to if function is called ot do so
     ArrayList<Jar> currentJars;
 
+    final static String defaultEmpty = "{\"document\":null}";
+
     public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
         this.api = api;
@@ -169,9 +171,6 @@ public class QueryHandler {
                 """.formatted(LocalDate.now().toString());
         processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
 
-        String match = """
-                {"document":null}""";
-
     }
 
     public String processQuery(String query, String endPoint) {
@@ -187,12 +186,11 @@ public class QueryHandler {
                     .addHeader("Access-Control-Request-Headers", "*")
                     .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
                     .build();
-
             response = client.newCall(request).execute();  // execute the request
             return Objects.requireNonNull(response.body()).string();
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
-            return "{\"document\":null}";
+            return defaultEmpty;
         } finally {
             response.close();  // Close the client
         }
@@ -206,8 +204,7 @@ public class QueryHandler {
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-        return !Objects.equals(postResponseBody.trim(), "{\"document\":null}");
-
+        return !Objects.equals(postResponse, defaultEmpty);
     }
 
     public void deleteJarQuery() {
