@@ -1,13 +1,16 @@
 package com.tikoJar.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import java.util.ArrayList;
+import org.bson.types.ObjectId;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jar {
 
-    private Long serverID;
+    String serverID;
     private String serverName;
     private OpeningCondition openingCondition;
     private String hashCode;
@@ -17,11 +20,11 @@ public class Jar {
 
     // Primary Constructor, createJar should use this, with OpeningCondition nested inside of Constructor
     // messages set to null to ensure array initialized in database
-    public Jar(Long serverID, String serverName, OpeningCondition openingCondition) {
+    public Jar(String serverID, String serverName, OpeningCondition openingCondition) {
         this.serverName = serverName;
         this.serverID = serverID;
         this.openingCondition = openingCondition; // nest opening condiiton inside Jar constructor
-        this.messages = null;
+        this.messages = new ArrayList<>();
         this.hashCode =  RandomStringUtils.randomAlphanumeric(20);  // hashCode, for possible additional admin related features
         // such as website access etc.
     }
@@ -30,11 +33,11 @@ public class Jar {
 
     public void setServerName(String serverName) {this.serverName = serverName;}
 
-    public Long getServerID() {
+    public String getServerID() {
         return serverID;
     }
 
-    public void setServerID(Long serverID) {
+    public void setServerID(String  serverID) {
         this.serverID = serverID;
     }
 
