@@ -92,25 +92,17 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-                    createJarQuery(new Jar(this.serverId,
-                            new OpeningCondition(true, messageLimit, 0 , event.getChannel().getIdAsString())));
-                } else
-                {
-                    createJarQuery(new Jar(this.serverId,
-                            new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));
-                }
-            }else{
-                responseBuilder.createJarResponse(true, true,true);
-            }
-        }else{
-            responseBuilder.createJarResponse(validSyntax, isAdmin, false);
-        }
-    }
+                    createJarQuery(new Jar(this.serverId,new OpeningCondition(
+                    true, messageLimit, 0 , event.getChannel().getIdAsString())));
+                } else { createJarQuery(new Jar(this.serverId,
+                 new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));}
+            }else{ responseBuilder.createJarResponse(true, true,true); }
+        }else{ responseBuilder.createJarResponse(validSyntax, isAdmin, false);}}
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
             deserializeAllJars();
-//           responseBuilder.viewMessagesResponse(isAdmin, currentJars);
+//            responseBuilder.viewMessagesResponse(isAdmin, currentJars);
         }{
             LOGGER.debug("No Jar found for : %s : %s".formatted(serverName, serverId));
         }
@@ -141,15 +133,8 @@ public class QueryHandler {
     }
 
     public void checkTimeLimits(){
-        String checkAndReturnExpired = """
-                {"collection":"Jars",
-                "database":"TikoJarTest",
-                "dataSource":"PositivityJar",
-                "filter": { "openingCondition.hasMessageLimit": { $eq : false },
-                            "openingCondition.creationDate": { $eq : "%s" }}}
-                """.formatted(LocalDate.now().toString());
-        String postResponse = processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
-        LOGGER.debug("-- Check Time Limits Post Response --\n%s".formatted(postResponse));
+        deserializeExpiredJars();
+//        responseBuilder.timeLimitEvent(this.currentJars);
     }
 
     public String processQuery(String query, String endPoint) {
@@ -200,20 +185,24 @@ public class QueryHandler {
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
-    private void deserializeJarFromResponseBody() {
+    private void deserializeExpiredJars() {
         try {
-            String checkJarExistsQuery = """
+            String checkAndReturnExpired = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
-                "filter": { "serverID": "%s" }}
-                """.formatted(serverId);
-            String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
-            this.currentJar = new ObjectMapper()
+                "filter": { "openingCondition.hasMessageLimit": { $eq : false },
+                            "openingCondition.openingDate": { $eq : "%s" }}}
+                """.formatted(LocalDate.now().toString());
+            String postResponse = processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
+            LOGGER.debug("Deserialize All Expired Post Response/n%s".formatted(postResponse));
+            String stripped = stripDocument(postResponse, true);
+            LOGGER.debug("Deserialize All Expired Post Strip/n%s".formatted(stripped));
+            this.currentJars = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                    stripDocument(postResponse, false), //from post http request response body which document enclosure stripped
-                    Jar.class);  // stores it in currentJar object in class
+                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
+                            Jar[].class);  // stores it in currentJar object in class
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
