@@ -188,14 +188,15 @@ public class QueryHandler {
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
-                "filter": { "openingCondition.hasMessageLimit": { $eq : false },
-                            "openingCondition.openingDate": { $eq : "%s" }}}
+                "filter": { "openingCondition.hasMessageLimit": { "$eq" : false },
+                            "openingCondition.openingDate": { "$eq" : "%s" }}}
                 """.formatted(LocalDate.now().toString());
             String postResponse = processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
             LOGGER.debug("Deserialize All Expired Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Expired Post Strip/n%s".formatted(stripped));
             ObjectMapper mapper = new ObjectMapper();
+
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
@@ -215,9 +216,13 @@ public class QueryHandler {
             LOGGER.debug("Deserialize All Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Post Strip/n%s".formatted(stripped));
+
             ObjectMapper mapper = new ObjectMapper();
+
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
             this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
+
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.jarLists));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
