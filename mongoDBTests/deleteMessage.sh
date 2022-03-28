@@ -6,5 +6,6 @@ curl --location --request POST 'https://data.mongodb-api.com/app/data-rlgbq/endp
              "database":"TikoJarTest",
              "dataSource":"PositivityJar",
              "filter": { "serverID": "956306200063008830" },
-             "update": { 
-                 "$pull": { "messages.$.messageId" : "VDFajqgcOQ" }} | json_pp
+             "update": {
+                { "messages.messageId" : "VDFajqgcOQ" },
+                { "$pull": { "messages.$.messageId" : "VDFajqgcOQ" }}}}' | json_pp
