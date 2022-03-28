@@ -22,5 +22,5 @@ public enum ENDPT {
     public String get() {
         return endPoint;
     }  // Gets enumerated endpoint
-    //hi
+
 }
