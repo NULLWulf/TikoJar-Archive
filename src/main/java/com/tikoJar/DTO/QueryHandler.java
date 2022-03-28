@@ -23,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import java.util.Objects;
 
 public class QueryHandler {
@@ -37,7 +36,6 @@ public class QueryHandler {
 
     ResponseBuilder responseBuilder;  // instantiated based on need
     // JSON Helper functions to assist with serialization and deserialization of queries
-    JSON_Handler jsonHelper;
 
     // Stores variables from response from HTTP client, client is closed after call so values in Response are volatile
     String postResponseBody;
@@ -111,10 +109,10 @@ public class QueryHandler {
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
-            // passing Admin function and currentJar for extrapolation in response builder
+            deserializeJarFromResponseBody();
             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }{
-            LOGGER.log(Level.valueOf("No Jar found for: %s"),serverId);
+            LOGGER.debug("No Jar found for : %s : %s".formatted(serverName, serverId));
         }
     }
 
@@ -202,13 +200,21 @@ public class QueryHandler {
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
-    private void deserializeJarFromResponseBody(String responseBody) {
+    private void deserializeJarFromResponseBody() {
         try {
-            currentJar = new ObjectMapper()
+            String checkJarExistsQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}
+                """.formatted(serverId);
+            String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+            this.currentJar = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                    stripDocument(postResponseBody), //from post http request response body which document enclosure stripped
+                    stripDocument(postResponse), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
+            LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
