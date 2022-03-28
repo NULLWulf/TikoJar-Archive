@@ -4,7 +4,7 @@ Authors (by Function)
 Nathan Wolf - QueryHandler Constructors, addMessage, viewMessage, checkMessageLimits
     - checkIfJarExists, checkIfMessageAdded, pullJar, processQuery, stripJar, createJarQuery
 Joel Santos - createJar, checkTimeLimits, deleteMessage, deleteJar
-Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
+Matthew Brown - initial class Skeleton, getHelp, inValidCommand, hello
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;

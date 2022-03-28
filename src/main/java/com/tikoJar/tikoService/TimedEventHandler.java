@@ -1,6 +1,8 @@
-package com.tikoJar.tikoService;
+/*
+Author: Matthew Brown
+ */
 
-import com.tikoJar.DTO.QueryHandler;
+package com.tikoJar.tikoService;
 
 import java.util.Calendar;
 import java.util.Timer;
