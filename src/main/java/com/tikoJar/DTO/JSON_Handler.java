@@ -1,4 +1,4 @@
-package com.tikoJar.tests;
+package com.tikoJar.DTO;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;

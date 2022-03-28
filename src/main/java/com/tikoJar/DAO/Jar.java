@@ -1,15 +1,16 @@
 package com.tikoJar.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import java.util.ArrayList;
-import org.bson.types.ObjectId;
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jar {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    String id;
     String serverID;
     private OpeningCondition openingCondition;
     private String hashCode;
