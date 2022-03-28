@@ -8,21 +8,18 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
 import com.tikoJar.DAO.OpeningCondition;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -129,10 +126,12 @@ public class QueryHandler {
     }
 
     public boolean checkMessageLimit(){  // Checks Message Limit store in Opening Condition with Size
-        return currentJar.getOpeningCondition().getMessageLimit() == currentJar.getMessages().size();
+        deserializeJar();
+        System.out.println(this.currentJar.getOpeningCondition().getMessageLimit() + " " + this.currentJar.getMessages().size());
+        return this.currentJar.getOpeningCondition().getMessageLimit() == this.currentJar.getMessages().size();
     }
 
-    public void checkTimeLimits(){
+    public void ckTimeLimits(){
         deserializeExpiredJars();
 //        responseBuilder.timeLimitEvent(this.currentJars);
     }
@@ -230,6 +229,30 @@ public class QueryHandler {
             LOGGER.warn(e.getMessage());
         }
     }
+
+    private void deserializeJar() {
+        try {
+            String pullJar = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}}
+                """.formatted(serverId);
+            String postResponse = processQuery(pullJar,ENDPT.FIND.get());
+            LOGGER.debug("Deserialize pullJar Post Response/n%s".formatted(postResponse));
+            String stripped = stripDocument(postResponse, false);
+            LOGGER.debug("Deserialize pullJar Strip/n%s".formatted(stripped));
+            this.currentJar = new ObjectMapper()
+                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
+                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
+                            Jar.class);  // stores it in currentJar object in class
+            LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
+        }catch (JsonProcessingException e){
+            LOGGER.warn(e.getMessage());
+        }
+    }
+
 
     public Boolean checkIfMessageAdded(Message addMessage) {
         // Block quotes query, is a NoSql Query that adds a message to the message array
