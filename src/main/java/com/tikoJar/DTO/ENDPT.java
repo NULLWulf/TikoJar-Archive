@@ -11,7 +11,7 @@ public enum ENDPT {
     UPDATE("updateOne"),
     DELETE("deleteOne"),
     AGG("aggregate"),
-    FINDALL("findAll");
+    FINDALL("find");
 
     private final String endPoint;
 

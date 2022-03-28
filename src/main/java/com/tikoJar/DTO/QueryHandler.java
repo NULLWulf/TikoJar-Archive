@@ -41,7 +41,7 @@ public class QueryHandler {
     String postResponseBody;
 
     Jar currentJar;  // is deserialized to if function is called ot do so
-    ArrayList<Jar> currentJars;
+    Jar[] currentJars;
 
     final static String defaultEmpty = "{\"document\":null}";
 
@@ -109,8 +109,8 @@ public class QueryHandler {
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
-            deserializeJarFromResponseBody();
-            responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+            deserializeAllJars();
+//           responseBuilder.viewMessagesResponse(isAdmin, currentJars);
         }{
             LOGGER.debug("No Jar found for : %s : %s".formatted(serverName, serverId));
         }
@@ -212,7 +212,7 @@ public class QueryHandler {
             this.currentJar = new ObjectMapper()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                    stripDocument(postResponse), //from post http request response body which document enclosure stripped
+                    stripDocument(postResponse, false), //from post http request response body which document enclosure stripped
                     Jar.class);  // stores it in currentJar object in class
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
@@ -220,7 +220,26 @@ public class QueryHandler {
         }
     }
 
-    private void deserializeJarsFromResponseBody() {
+    private void deserializeAllJars() {
+        try {
+            String checkJarExistsQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar"}
+                """;
+            String postResponse = processQuery(checkJarExistsQuery,ENDPT.FINDALL.get());
+            LOGGER.debug("Deserialize All Post Response/n%s".formatted(postResponse));
+            String stripped = stripDocument(postResponse, true);
+            LOGGER.debug("Deserialize All Post Strip/n%s".formatted(stripped));
+            this.currentJars = new ObjectMapper()
+                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
+                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
+                            Jar[].class);  // stores it in currentJar object in class
+            LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
+        }catch (JsonProcessingException e){
+            LOGGER.warn(e.getMessage());
+        }
     }
 
     public Boolean checkIfMessageAdded(Message addMessage) {
@@ -238,10 +257,15 @@ public class QueryHandler {
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
-    public String stripDocument(String preStrip){  // strips document encapsulation from projected HTTP NoSql Queries
+    public String stripDocument(String preStrip, Boolean isArray){  // strips document encapsulation from projected HTTP NoSql Queries
         // this formats that string representative in a way of how it's inserted into the database thus deserialization
         // should be easier
-        return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure
+        if (isArray){
+            return StringUtils.substring(preStrip,13, preStrip.length() - 1);
+        }else {
+            return StringUtils.substring(preStrip,12, preStrip.length() - 1);  // removes Document enclosure in JSON
+        }
+
     }
     public void createJarQuery(Jar jar) {
         String createJarQuery = """
