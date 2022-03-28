@@ -40,6 +40,11 @@ public class QueryHandler {
     ArrayList<Jar> jarLists;
 
     final static String defaultEmpty = "{\"document\":null}";
+    final static String found1Updated1 = """
+                                        {
+                                        "matchedCount" : 1,
+                                        "modifiedCount" : 1
+                                        }""".stripIndent();
 
     public QueryHandler(){
         responseBuilder = new ResponseBuilder();
@@ -110,8 +115,7 @@ public class QueryHandler {
     public void deleteMessage(boolean includedMessageID, String messageID){
         boolean messageDeleted = true;
         if(includedMessageID){
-            // TODO: delete message if it exists
-            // TODO: else, messageDeleted = false;
+            deleteMessageQuery(messageID);
         }
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
     }
@@ -178,6 +182,21 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
+        String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
+    }
+
+    public void deleteMessageQuery(String messageId) {
+        String checkJarExistsQuery = """
+               {"collection": "Jars",
+               "database": "TikoJarTest",
+               "dataSource": "PositivityJar",
+               "filter": {
+                   "serverID": "%s"
+               },
+               "update": {
+                   "$pull": {"messages":{"messageId":"%s"}}}}}
+                """.formatted(serverId, messageId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
