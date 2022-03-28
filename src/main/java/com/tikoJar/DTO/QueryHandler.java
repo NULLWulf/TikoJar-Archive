@@ -28,22 +28,22 @@ import java.util.Objects;
 public class QueryHandler {
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
-    private final MessageCreateEvent event;
+    private MessageCreateEvent event;
     DiscordApi api;
 
     String serverId;  // serverID are Long data types
     String serverName; // serverNames are string
 
     ResponseBuilder responseBuilder;  // instantiated based on need
-    // JSON Helper functions to assist with serialization and deserialization of queries
-
-    // Stores variables from response from HTTP client, client is closed after call so values in Response are volatile
-    String postResponseBody;
 
     Jar currentJar;  // is deserialized to if function is called ot do so
-    List<Jar> jarLists;
+    ArrayList<Jar> jarLists;
 
     final static String defaultEmpty = "{\"document\":null}";
+
+    public QueryHandler(){
+        responseBuilder = new ResponseBuilder();
+    }
 
     public QueryHandler(MessageCreateEvent event, DiscordApi api) {
         this.event = event;
@@ -63,7 +63,6 @@ public class QueryHandler {
                 Initializing QueryHandler for %s : %s "
                 """.formatted(serverId, serverName));
     }
-
 
     public void addMessage(String message) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
@@ -85,7 +84,6 @@ public class QueryHandler {
                     """.formatted(serverId));
             responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
         }
-
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
@@ -94,7 +92,8 @@ public class QueryHandler {
                 if (messageLimit != 0){
                     createJarQuery(new Jar(this.serverId,new OpeningCondition(
                     true, messageLimit, 0 , event.getChannel().getIdAsString())));
-                } else { createJarQuery(new Jar(this.serverId,
+                }
+                else { createJarQuery(new Jar(this.serverId,
                  new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));}
             }else{ responseBuilder.createJarResponse(true, true,true); }
         }else{ responseBuilder.createJarResponse(validSyntax, isAdmin, false);}}
@@ -301,6 +300,10 @@ public class QueryHandler {
                 """.formatted(serverId));
         responseBuilder.invalidCommandResponse();
     }
+
+    public void checkExpiredJars() {
+        deserializeExpiredJars();
+        if(jarLists != null)
+        responseBuilder.timeLimitEvent(this.jarLists);
+    }
 }
-
-
