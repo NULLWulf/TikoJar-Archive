@@ -15,8 +15,8 @@ public class TimedEventHandler {
         TimerTask repeatedTask = new TimerTask() {
 
             public void run() {
-                QueryHandler queryHandler = new QueryHandler();
-                queryHandler.checkExpiredJars();
+//                QueryHandler queryHandler = new QueryHandler();
+//                queryHandler.checkExpiredJars();
             }
 
         };
