@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class ResponseBuilder {
 
-    private final MessageCreateEvent event;
+    private MessageCreateEvent event;
     private Jar jar;
     private DiscordApi api;
 
@@ -21,6 +21,8 @@ public class ResponseBuilder {
         this.api = api;
 
     }
+
+    public ResponseBuilder(){}
 
     public void addMessageResponse(boolean messageAdded){
 
@@ -190,7 +192,7 @@ public class ResponseBuilder {
 
     }
 
-    public void timeLimitEvent(){
+    public void timeLimitEvent(ArrayList<Jar> expiredJarsList){
 
         // TODO: format and deliver messages
 
