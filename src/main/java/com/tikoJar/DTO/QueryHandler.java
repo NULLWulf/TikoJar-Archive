@@ -8,6 +8,7 @@ Matt Brown - initial class Skeleton, getHelp, inValidCommand, hello
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
@@ -20,6 +21,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -38,7 +41,7 @@ public class QueryHandler {
     String postResponseBody;
 
     Jar currentJar;  // is deserialized to if function is called ot do so
-    Jar[] currentJars;
+    List<Jar> jarLists;
 
     final static String defaultEmpty = "{\"document\":null}";
 
@@ -98,9 +101,9 @@ public class QueryHandler {
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
-            deserializeAllJars();
-//            responseBuilder.viewMessagesResponse(isAdmin, currentJars);
-        }{
+            deserializeJar();
+            responseBuilder.viewMessagesResponse(isAdmin, currentJar);
+        }else{
             LOGGER.debug("No Jar found for : %s : %s".formatted(serverName, serverId));
         }
     }
@@ -127,13 +130,9 @@ public class QueryHandler {
 
     public boolean checkMessageLimit(){  // Checks Message Limit store in Opening Condition with Size
         deserializeJar();
-        System.out.println(this.currentJar.getOpeningCondition().getMessageLimit() + " " + this.currentJar.getMessages().size());
+        System.out.println(this.currentJar
+                .getOpeningCondition().getMessageLimit() + " " + this.currentJar.getMessages().size());
         return this.currentJar.getOpeningCondition().getMessageLimit() == this.currentJar.getMessages().size();
-    }
-
-    public void ckTimeLimits(){
-        deserializeExpiredJars();
-//        responseBuilder.timeLimitEvent(this.currentJars);
     }
 
     public String processQuery(String query, String endPoint) {
@@ -197,11 +196,9 @@ public class QueryHandler {
             LOGGER.debug("Deserialize All Expired Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Expired Post Strip/n%s".formatted(stripped));
-            this.currentJars = new ObjectMapper()
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
-                            Jar[].class);  // stores it in currentJar object in class
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
@@ -219,12 +216,10 @@ public class QueryHandler {
             LOGGER.debug("Deserialize All Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Post Strip/n%s".formatted(stripped));
-            this.currentJars = new ObjectMapper()
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
-                            Jar[].class);  // stores it in currentJar object in class
-            LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
+            LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.jarLists));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
@@ -242,11 +237,10 @@ public class QueryHandler {
             LOGGER.debug("Deserialize pullJar Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, false);
             LOGGER.debug("Deserialize pullJar Strip/n%s".formatted(stripped));
+
             this.currentJar = new ObjectMapper()
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                    .readValue(  // Initialize Jar Object, Jackson mapper reads values
-                            stripDocument(postResponse, true), //from post http request response body which document enclosure stripped
-                            Jar.class);  // stores it in currentJar object in class
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .readValue(stripped, Jar.class);  // Initialize Jar Object, Jackson mapper reads values
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());

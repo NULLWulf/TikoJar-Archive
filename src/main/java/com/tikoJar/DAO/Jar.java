@@ -1,19 +1,13 @@
 package com.tikoJar.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.*;
-import org.apache.commons.lang3.RandomStringUtils;
 import java.util.ArrayList;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jar {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    String id;
     String serverID;
     private OpeningCondition openingCondition;
-    private String hashCode;
     private ArrayList<Message> messages;
 
     public Jar(){}  // Empty constructor needed for Jackson
@@ -24,7 +18,6 @@ public class Jar {
         this.serverID = serverID;
         this.openingCondition = openingCondition; // nest opening condiiton inside Jar constructor
         this.messages = new ArrayList<>();
-        this.hashCode =  RandomStringUtils.randomAlphanumeric(20);  // hashCode, for possible additional admin related features
         // such as website access etc.
     }
 
@@ -32,7 +25,7 @@ public class Jar {
         return serverID;
     }
 
-    public void setServerID(String  serverID) {
+    public void setServerID(String serverID) {
         this.serverID = serverID;
     }
 
@@ -48,11 +41,7 @@ public class Jar {
         return messages;
     }
 
-    public void setMessages(ArrayList<Message> person) {
-        this.messages = person;
+    public void setMessages(ArrayList<Message> messages) {
+        this.messages = messages;
     }
-
-    public String getHashCode() { return hashCode;}
-
-    public void setHashCode(String hashCode) { this.hashCode = hashCode;}
 }

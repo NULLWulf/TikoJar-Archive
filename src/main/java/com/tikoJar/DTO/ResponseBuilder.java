@@ -65,6 +65,9 @@ public class ResponseBuilder {
 
     public void viewMessagesResponse(boolean isAdmin, Jar jar){
 
+        Jar activeJar = jar;
+        JSON_Handler json_handler = new JSON_Handler();
+        System.out.println(json_handler.getObjAsJSONString(activeJar));
         // if no jar exists
         if(jar == null){
 
