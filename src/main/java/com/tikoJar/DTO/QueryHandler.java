@@ -197,7 +197,7 @@ public class QueryHandler {
                    "serverID": "%s"
                },
                "update": {
-                   "$pull": {"messages":{"messageId":"%s"}}}}}
+                   "$pull": {"messages":{"messageId":"%s"}}}}
                 """.formatted(serverId, messageId);
         String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
