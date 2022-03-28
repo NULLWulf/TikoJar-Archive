@@ -1,3 +1,9 @@
+/*
+Authors:
+Matthew Brown
+Nathan Wolf
+ */
+
 package com.tikoJar.DAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

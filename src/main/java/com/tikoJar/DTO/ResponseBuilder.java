@@ -1,8 +1,16 @@
+/*
+Author: Matthew Brown
+ */
+
 package com.tikoJar.DTO;
 
 import com.tikoJar.DAO.Jar;
 import com.tikoJar.DAO.Message;
+import com.tikoJar.tikoService.TokenHandler;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.channel.Channel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -12,8 +20,9 @@ import java.util.ArrayList;
 public class ResponseBuilder {
 
     private MessageCreateEvent event;
-    private Jar jar;
     private DiscordApi api;
+
+    public ResponseBuilder(){}
 
     public ResponseBuilder(MessageCreateEvent event, DiscordApi api){
 
@@ -21,8 +30,6 @@ public class ResponseBuilder {
         this.api = api;
 
     }
-
-    public ResponseBuilder(){}
 
     public void addMessageResponse(boolean messageAdded){
 
@@ -107,7 +114,7 @@ public class ResponseBuilder {
                         // TODO: verify that this casting is not causing an issue
                         User user = (User) api.getUserById(message.getUserID());
 
-                        String nickname = "user";
+                        String nickname = "Unknown User";
 
                         if (user != null) {
 
@@ -116,8 +123,8 @@ public class ResponseBuilder {
                         }
 
                         responseString
-                                .append("Message submitted by ").append(nickname).append(" on ").append(date)
-                                .append(" (message ID #").append(messageID).append("):\n").append(messageContent)
+                                .append("***Message submitted by ").append(nickname).append(" on ").append(date)
+                                .append(" (message ID #").append(messageID).append("):***\n").append(messageContent)
                                 .append("\n\n")
                         ;
 
@@ -194,13 +201,126 @@ public class ResponseBuilder {
 
     public void timeLimitEvent(ArrayList<Jar> expiredJarsList){
 
-        // TODO: format and deliver messages
+        String token = TokenHandler.TOKEN;
+
+        DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
+
+        for(Jar jar: expiredJarsList){
+
+            StringBuilder responseString = new StringBuilder("");
+            ArrayList<Message> messages = jar.getMessages();
+
+            Server server = api.getServerById(jar.getServerID()).orElse(null);
+
+            // skips jar if server no longer exists
+            if(server != null) {
+
+                String serverName = server.getName();
+                String creationDate = jar.getOpeningCondition().getCreationDate();
+
+                responseString.append("**Good day, " + serverName + "! ")
+                        .append("And what a glorious day it is, for today is the day of your server's jar opening " +
+                                "event!\n\n")
+                        .append("I remember when you created this jar, back on " + creationDate + ". ")
+                        .append("Since then, you've shared so many wonderful moments with me. " +
+                                messages.size() + " moments, in fact! ")
+                        .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
+                        .append("Please enjoy reflecting on all these fond memories** :)\n\n\n");
+
+                for (Message message : messages) {
+
+                    String date = message.getDatePosted();
+                    String messageContent = message.getMessageContent();
+
+                    // TODO: verify that this casting is not causing an issue
+                    User user = (User) api.getUserById(message.getUserID());
+
+                    String nickname = "Unknown User";
+
+                    if (user != null) {
+
+                        nickname = user.getNickname(server).orElse(user.getDisplayName(server));
+
+                    }
+
+                    responseString
+                            .append("***Message submitted by ").append(nickname).append(" on ").append(date)
+                            .append(":***\n").append(messageContent).append("\n\n")
+                    ;
+
+                    String channelID = jar.getOpeningCondition().getServerChannelID();
+                    Channel channel = server.getChannelById(channelID).orElse(null);
+                    TextChannel textChannel = channel.asTextChannel().orElse(null);
+
+                    if (textChannel != null) {
+
+                        textChannel.sendMessage(responseString.toString());
+
+                    }
+
+                }
+
+            }
+
+        }
 
     }
 
     public void messageLimitEvent(Jar jar){
 
         // TODO: format and deliver messages
+        StringBuilder responseString = new StringBuilder("");
+
+        ArrayList<Message> messages = jar.getMessages();
+
+        Server server = event.getServer().orElse(null);
+
+        String serverName = server.getName();
+        String creationDate = jar.getOpeningCondition().getCreationDate();
+
+        responseString.append("**Good day, " + serverName + "! ")
+                .append("And what a glorious day it is, for today is the day of your server's jar opening " +
+                        "event!\n\n")
+                .append("I remember when you created this jar, back on " + creationDate + ". ")
+                .append("Since then, you've shared so many wonderful moments with me. " +
+                        messages.size() + " moments, in fact! ")
+                .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
+                .append("Please enjoy reflecting on all these fond memories** :)\n\n\n");
+
+        for (Message message : messages) {
+
+            String date = message.getDatePosted();
+            String messageContent = message.getMessageContent();
+
+            // TODO: verify that this casting is not causing an issue
+            User user = (User) api.getUserById(message.getUserID());
+
+            String nickname = "Unknown User";
+
+            if (user != null) {
+
+                nickname = user.getNickname(server).orElse(user.getDisplayName(server));
+
+            }
+
+            responseString
+                    .append("***Message submitted by ").append(nickname).append(" on ").append(date)
+                    .append(":***\n").append(messageContent).append("\n\n")
+            ;
+
+            String channelID = jar.getOpeningCondition().getServerChannelID();
+            Channel channel = server.getChannelById(channelID).orElse(null);
+            TextChannel textChannel = channel.asTextChannel().orElse(null);
+
+            if (textChannel != null) {
+
+                textChannel.sendMessage(responseString.toString());
+
+            }
+
+        }
+
+        event.getChannel().sendMessage(responseString.toString());
 
     }
 

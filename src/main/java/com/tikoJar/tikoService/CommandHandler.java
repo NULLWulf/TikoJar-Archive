@@ -1,3 +1,7 @@
+/*
+Author: Matthew Brown
+ */
+
 package com.tikoJar.tikoService;
 
 import com.tikoJar.DTO.QueryHandler;
