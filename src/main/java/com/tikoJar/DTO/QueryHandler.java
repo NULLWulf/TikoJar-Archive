@@ -115,7 +115,9 @@ public class QueryHandler {
     public void deleteMessage(boolean includedMessageID, String messageID){
         boolean messageDeleted = true;
         if(includedMessageID){
-            deleteMessageQuery(messageID);
+            if(checkIfJarExists()){
+                deleteMessageQuery(messageID);
+            }
         }
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
     }
