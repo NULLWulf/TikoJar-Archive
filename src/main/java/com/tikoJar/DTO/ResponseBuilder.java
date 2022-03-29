@@ -91,6 +91,8 @@ public class ResponseBuilder {
                 Server server = event.getServer().orElse(null);
                 String userID = event.getMessageAuthor().getIdAsString();
 
+                int messageDisplayCount = 0;
+
                 if (isAdmin) {
 
                     responseString.append("**Showing all messages:**\n\n");
@@ -104,6 +106,7 @@ public class ResponseBuilder {
                 }
 
                 for (Message message : messages) {
+
 
                     if (isAdmin || message.getUserID().equals(userID)) {
 
@@ -127,11 +130,24 @@ public class ResponseBuilder {
                                 .append("\n\n")
                         ;
 
+                        messageDisplayCount++;
+
                     }
 
                 }
 
-                event.getChannel().sendMessage(responseString.toString());
+                if (messageDisplayCount > 0) {
+
+                    event.getMessageAuthor().asUser().ifPresent(invokingUser ->
+                            invokingUser.sendMessage(responseString.toString()));
+
+                    event.getChannel().sendMessage("I have sent you a list via DM.");
+
+                } else {
+
+                    event.getChannel().sendMessage("You have not added any messages to this jar.");
+
+                }
 
             } else {
 
