@@ -32,8 +32,7 @@ public class QueryHandler {
     DiscordApi api;
 
     String serverId;  // serverID are Long data types
-    String serverName; // serverNames are string
-
+    String serverName; // serverNames are strinde
     ResponseBuilder responseBuilder;  // instantiated based on need
 
     Jar currentJar;  // is deserialized to if function is called ot do so
@@ -121,10 +120,11 @@ public class QueryHandler {
     }
 
     public void deleteMessage(boolean includedMessageID, String messageID){
-        boolean messageDeleted = true;
+        boolean messageDeleted = false;
         if(includedMessageID){
             if(checkIfJarExists()){
                 deleteMessageQuery(messageID);
+                messageDeleted = true;
             }
         }
         responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
@@ -207,7 +207,7 @@ public class QueryHandler {
                "update": {
                    "$pull": {"messages":{"messageId":"%s"}}}}}
                 """.formatted(serverId, messageId);
-        String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        String postResponse = processQuery(checkJarExistsQuery,ENDPT.UPDATE.get());
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
