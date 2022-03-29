@@ -112,7 +112,7 @@ public class ResponseBuilder {
                         String messageContent = message.getMessageContent();
 
                         // TODO: verify that this casting is not causing an issue
-                        User user = (User) api.getUserById(message.getUserID());
+                        User user = api.getCachedUserById(message.getUserID()).orElse(null);
 
                         String nickname = "Unknown User";
 
@@ -233,7 +233,7 @@ public class ResponseBuilder {
                     String messageContent = message.getMessageContent();
 
                     // TODO: verify that this casting is not causing an issue
-                    User user = (User) api.getUserById(message.getUserID());
+                    User user = api.getCachedUserById(message.getUserID()).orElse(null);
 
                     String nickname = "Unknown User";
 
@@ -293,7 +293,7 @@ public class ResponseBuilder {
             String messageContent = message.getMessageContent();
 
             // TODO: verify that this casting is not causing an issue
-            User user = (User) api.getUserById(message.getUserID());
+            User user = api.getCachedUserById(message.getUserID()).orElse(null);
 
             String nickname = "Unknown User";
 
