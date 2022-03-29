@@ -4,6 +4,8 @@ Author: Matthew Brown
 
 package com.tikoJar.tikoService;
 
+import com.tikoJar.DTO.QueryHandler;
+
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,12 +15,12 @@ public class TimedEventHandler {
 
     public TimedEventHandler(){
 
-        // Set QueryHandler.checkTimeLimits() to run repeatedly on a schedule
+        // Set QueryHandler.checkTimeLimits() to execute on a repeated schedule
         TimerTask repeatedTask = new TimerTask() {
 
             public void run() {
-//                QueryHandler queryHandler = new QueryHandler();
-//                queryHandler.checkExpiredJars();
+                QueryHandler queryHandler = new QueryHandler();
+                queryHandler.checkExpiredJars();
             }
 
         };

@@ -82,7 +82,7 @@ public class ResponseBuilder {
 
         } else {
 
-            StringBuilder responseString = new StringBuilder("");
+            StringBuilder responseString = new StringBuilder();
 
             ArrayList<Message> messages = jar.getMessages();
 
@@ -99,7 +99,7 @@ public class ResponseBuilder {
 
                     String nickname = getNickname();
 
-                    responseString.append("**Showing messages submitted by " + nickname + ":**\n\n");
+                    responseString.append("**Showing messages submitted by ").append(nickname).append(":**\n\n");
 
                 }
 
@@ -111,7 +111,6 @@ public class ResponseBuilder {
                         String messageID = message.getMessageId();
                         String messageContent = message.getMessageContent();
 
-                        // TODO: verify that this casting is not causing an issue
                         User user = api.getCachedUserById(message.getUserID()).orElse(null);
 
                         String nickname = "Unknown User";
@@ -186,16 +185,15 @@ public class ResponseBuilder {
 
     public void getHelpResponse(){
 
-        event.getChannel().sendMessage("" +
-                "**Here's a list of my commands:** ```" +
-                "!tiko add <positive message>\n" +
-                "!tiko create <JAR DETAILS>\n" + // TODO: replace JAR DETAILS with proper syntax options
-                "!tiko delete jar\n" +
-                "!tiko delete message <message ID>\n" +
-                "!tiko hello\n" +
-                "!tiko help\n" +
-                "!tiko view messages```\n" +
-                "**For more detailed instructions, visit OUR WEB URL**"); // TODO: replace OUR WEB URL with actual URL
+        event.getChannel().sendMessage("""
+                **Here's a list of my commands:** ```!tiko add <positive message>
+                !tiko create <JAR DETAILS>
+                !tiko delete jar
+                !tiko delete message <message ID>
+                !tiko hello
+                !tiko help
+                !tiko view messages```
+                **For more detailed instructions, visit OUR WEB URL**"""); // TODO: replace OUR WEB URL with actual URL
 
     }
 
@@ -207,7 +205,6 @@ public class ResponseBuilder {
 
         for(Jar jar: expiredJarsList){
 
-            StringBuilder responseString = new StringBuilder("");
             ArrayList<Message> messages = jar.getMessages();
 
             Server server = api.getServerById(jar.getServerID()).orElse(null);
@@ -215,48 +212,22 @@ public class ResponseBuilder {
             // skips jar if server no longer exists
             if(server != null) {
 
-                String serverName = server.getName();
-                String creationDate = jar.getOpeningCondition().getCreationDate();
+                String responseString = eventResponseBuilder(server, messages, api, jar);
 
-                responseString.append("**Good day, " + serverName + "! ")
-                        .append("And what a glorious day it is, for today is the day of your server's jar opening " +
-                                "event!\n\n")
-                        .append("I remember when you created this jar, back on " + creationDate + ". ")
-                        .append("Since then, you've shared so many wonderful moments with me. " +
-                                messages.size() + " moments, in fact! ")
-                        .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
-                        .append("Please enjoy reflecting on all these fond memories** :)\n\n\n");
+                String channelID = jar.getOpeningCondition().getServerChannelID();
+                Channel channel = server.getChannelById(channelID).orElse(null);
 
-                for (Message message : messages) {
+                TextChannel textChannel = null;
 
-                    String date = message.getDatePosted();
-                    String messageContent = message.getMessageContent();
+                if (channel != null) {
 
-                    // TODO: verify that this casting is not causing an issue
-                    User user = api.getCachedUserById(message.getUserID()).orElse(null);
+                    textChannel = channel.asTextChannel().orElse(null);
 
-                    String nickname = "Unknown User";
+                }
 
-                    if (user != null) {
+                if (textChannel != null) {
 
-                        nickname = user.getNickname(server).orElse(user.getDisplayName(server));
-
-                    }
-
-                    responseString
-                            .append("***Message submitted by ").append(nickname).append(" on ").append(date)
-                            .append(":***\n").append(messageContent).append("\n\n")
-                    ;
-
-                    String channelID = jar.getOpeningCondition().getServerChannelID();
-                    Channel channel = server.getChannelById(channelID).orElse(null);
-                    TextChannel textChannel = channel.asTextChannel().orElse(null);
-
-                    if (textChannel != null) {
-
-                        textChannel.sendMessage(responseString.toString());
-
-                    }
+                    textChannel.sendMessage(responseString);
 
                 }
 
@@ -268,22 +239,34 @@ public class ResponseBuilder {
 
     public void messageLimitEvent(Jar jar){
 
-        // TODO: format and deliver messages
-        StringBuilder responseString = new StringBuilder("");
-
         ArrayList<Message> messages = jar.getMessages();
 
         Server server = event.getServer().orElse(null);
 
+        if (server != null) {
+
+            String responseString = eventResponseBuilder(server, messages, api, jar);
+
+            event.getChannel().sendMessage(responseString);
+
+        }
+
+    }
+
+    public String eventResponseBuilder(Server server, ArrayList<Message> messages, DiscordApi api, Jar jar){
+
+        StringBuilder responseString = new StringBuilder();
+
         String serverName = server.getName();
         String creationDate = jar.getOpeningCondition().getCreationDate();
 
-        responseString.append("**Good day, " + serverName + "! ")
-                .append("And what a glorious day it is, for today is the day of your server's jar opening " +
-                        "event!\n\n")
-                .append("I remember when you created this jar, back on " + creationDate + ". ")
-                .append("Since then, you've shared so many wonderful moments with me. " +
-                        messages.size() + " moments, in fact! ")
+        responseString.append("**Good day, ").append(serverName).append("! ")
+                .append("""
+                        And what a glorious day it is, for today is the day of your server's jar opening event!
+
+                        """).append("I remember when you created this jar, back on ").append(creationDate).append(". ")
+                .append("Since then, you've shared so many wonderful moments with me. ").append(messages.size())
+                .append(" moments, in fact! ")
                 .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
                 .append("Please enjoy reflecting on all these fond memories** :)\n\n\n");
 
@@ -292,7 +275,6 @@ public class ResponseBuilder {
             String date = message.getDatePosted();
             String messageContent = message.getMessageContent();
 
-            // TODO: verify that this casting is not causing an issue
             User user = api.getCachedUserById(message.getUserID()).orElse(null);
 
             String nickname = "Unknown User";
@@ -308,20 +290,9 @@ public class ResponseBuilder {
                     .append(":***\n").append(messageContent).append("\n\n")
             ;
 
-            String channelID = jar.getOpeningCondition().getServerChannelID();
-            Channel channel = server.getChannelById(channelID).orElse(null);
-            TextChannel textChannel = channel.asTextChannel().orElse(null);
-
-            if (textChannel != null) {
-
-                textChannel.sendMessage(responseString.toString());
-
-            }
-
         }
 
-        event.getChannel().sendMessage(responseString.toString());
-
+        return responseString.toString();
     }
 
     public void helloResponse(){
