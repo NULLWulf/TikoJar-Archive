@@ -48,7 +48,7 @@ public class ResponseBuilder {
         }
     }
 
-    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean hasJar) {
+    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean createdJar) {
 
         if(!validSyntax){
 
@@ -59,7 +59,7 @@ public class ResponseBuilder {
 
             event.getChannel().sendMessage("I'm sorry, only a server admin can perform this task.");
 
-        } else if (hasJar) {
+        } else if (!createdJar) {
 
             event.getChannel().sendMessage("Hmmm... it looks like your server already has a jar. " +
                     "If you would like to replace it, please delete the current jar first. " +

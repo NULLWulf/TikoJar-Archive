@@ -95,13 +95,21 @@ public class QueryHandler {
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit != 0){
-                    createJarQuery(new Jar(this.serverId,new OpeningCondition(
-                    true, messageLimit, 0 , event.getChannel().getIdAsString())));
+                    createJarQuery(new Jar(this.serverId,new OpeningCondition(true, messageLimit,
+                            0 , event.getChannel().getIdAsString())));
                 }
-                else { createJarQuery(new Jar(this.serverId,
-                 new OpeningCondition(false, 0, timeLimitInDays, event.getChannel().getIdAsString())));}
-            }else{ responseBuilder.createJarResponse(true, true,true); }
-        }else{ responseBuilder.createJarResponse(validSyntax, isAdmin, false);}}
+                else {
+                    createJarQuery(new Jar(this.serverId, new OpeningCondition(false, 0,
+                            timeLimitInDays, event.getChannel().getIdAsString())));
+                }
+                responseBuilder.createJarResponse(true, true,true);
+            }else{
+                responseBuilder.createJarResponse(true, true,false);
+            }
+        }else{
+            responseBuilder.createJarResponse(validSyntax, isAdmin, false);
+        }
+    }
 
     public void viewMessages(boolean isAdmin) {
         if(checkIfJarExists()){
