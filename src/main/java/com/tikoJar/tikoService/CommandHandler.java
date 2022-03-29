@@ -48,98 +48,90 @@ public class CommandHandler {
 
         new TimedEventHandler();
 
-        api.addMessageCreateListener(event -> {
+        api.addMessageCreateListener(event -> new Thread(() -> {
 
-            new Thread(() -> {
+            String[] messageContent = event.getMessageContent().split("\\s");
 
-                String[] messageContent = event.getMessageContent().split("\\s");
+            // Proceed only if message has content
+            if (messageContent.length > 0) {
 
-                // Proceed only if message has content
-                if (messageContent.length > 0) {
+                // Proceed only if message begins with !tiko
+                if (messageContent[0].equalsIgnoreCase(MethodID.COMMANDPREFIX.getCommand())) {
 
-                    // Proceed only if message begins with !tiko
-                    if (messageContent[0].equalsIgnoreCase(MethodID.COMMANDPREFIX.getCommand())) {
+                    // Determine whether message author is server admin
+                    boolean isAdmin = event.getMessageAuthor().isServerAdmin();
 
-                        // Determine whether message author is server admin
-                        boolean isAdmin = event.getMessageAuthor().isServerAdmin();
+                    // Instantiate QueryHandler for method calls
+                    QueryHandler queryHandler = new QueryHandler(event, api);
 
-                        // Instantiate QueryHandler for method calls
-                        QueryHandler queryHandler = new QueryHandler(event, api);
+                    // Determine number of words contained in user message
+                    if (messageContent.length >= 3) {
 
-                        // Determine number of words contained in user message
-                        if (messageContent.length >= 3) {
+                        if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
-                            if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
+                            // TODO: ADD MESSAGE LENGTH LIMIT (250 WORDS)
 
-                                // TODO: ADD MESSAGE LENGTH LIMIT (250 WORDS)
+                            StringBuilder message = new StringBuilder();
 
-                                StringBuilder message = new StringBuilder();
+                            message.append(messageContent[2]);
 
-                                message.append(messageContent[2]);
+                            if (messageContent.length > 3){
 
-                                if (messageContent.length > 3){
+                                for (int i = 3; i < messageContent.length; i++){
 
-                                    for (int i = 2; i < messageContent.length; i++){
+                                    message.append(" ");
+                                    message.append(messageContent[i]);
 
-                                        message.append(" ");
-                                        message.append(messageContent[i]);
+                                }
+
+                            }
+                            queryHandler.addMessage(message.toString());
+
+                        } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                MethodID.DELETEMESSAGE.getCommand())) {
+
+                            boolean includedMessageID = true;
+                            String messageID = "";
+
+                            if (messageContent.length == 4) {
+
+                                messageID = messageContent[3];
+
+                            } else {
+
+                                includedMessageID = false;
+
+                            }
+
+                            queryHandler.deleteMessage(includedMessageID, messageID);
+
+                        } else if (messageContent[1].equalsIgnoreCase(MethodID.CREATEJAR.getCommand())) {
+
+                            boolean validSyntax = true;
+                            int messageLimit = 0;
+                            int timeLimit = 0;
+
+                            if (messageContent.length == 4) {
+
+                                if (messageContent[2].equalsIgnoreCase(MethodID.MESSAGELIMIT.getCommand())){
+
+                                    try {
+
+                                        messageLimit = Integer.parseInt(messageContent[3]);
+
+                                    } catch (NumberFormatException nfe) {
+
+                                        validSyntax = false;
 
                                     }
 
-                                }
-                                queryHandler.addMessage(message.toString());
+                                } else if (messageContent[2].equalsIgnoreCase(MethodID.TIMELIMIT.getCommand())){
 
-                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
-                                    MethodID.DELETEMESSAGE.getCommand())) {
+                                    try {
 
-                                boolean includedMessageID = true;
-                                String messageID = "";
+                                        timeLimit = Integer.parseInt(messageContent[3]);
 
-                                if (messageContent.length == 4) {
-
-                                    messageID = messageContent[3];
-
-                                } else {
-
-                                    includedMessageID = false;
-
-                                }
-
-                                queryHandler.deleteMessage(includedMessageID, messageID);
-
-                            } else if (messageContent[1].equalsIgnoreCase(MethodID.CREATEJAR.getCommand())) {
-
-                                boolean validSyntax = true;
-                                int messageLimit = 0;
-                                int timeLimit = 0;
-
-                                if (messageContent.length == 4) {
-
-                                    if (messageContent[2].equalsIgnoreCase(MethodID.MESSAGELIMIT.getCommand())){
-
-                                        try {
-
-                                            messageLimit = Integer.parseInt(messageContent[3]);
-
-                                        } catch (NumberFormatException nfe) {
-
-                                            validSyntax = false;
-
-                                        }
-
-                                    } else if (messageContent[2].equalsIgnoreCase(MethodID.TIMELIMIT.getCommand())){
-
-                                        try {
-
-                                            timeLimit = Integer.parseInt(messageContent[3]);
-
-                                        } catch (NumberFormatException nfe) {
-
-                                            validSyntax = false;
-
-                                        }
-
-                                    } else {
+                                    } catch (NumberFormatException nfe) {
 
                                         validSyntax = false;
 
@@ -151,54 +143,38 @@ public class CommandHandler {
 
                                 }
 
-                                    queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
-
-
-                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
-                                    MethodID.VIEWMESSAGES.getCommand())) {
-
-                                if (messageContent.length > 3){
-
-                                    queryHandler.invalidCommand();
-
-                                } else {
-
-                                        queryHandler.viewMessages(isAdmin);
-
-                                }
-
-                            } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
-                                    MethodID.DELETEJAR.getCommand())) {
-
-                                if (messageContent.length > 3){
-
-                                    queryHandler.invalidCommand();
-
-                                } else {
-
-                                    queryHandler.deleteJar(isAdmin);
-
-                                }
-
                             } else {
 
-                                queryHandler.invalidCommand();
+                                validSyntax = false;
 
                             }
 
-                        } else if (messageContent.length >= 2) {
+                                queryHandler.createJar(validSyntax, isAdmin, messageLimit, timeLimit);
 
-                            if (messageContent[1].equalsIgnoreCase(MethodID.HELLO.getCommand())) {
 
-                                queryHandler.hello();
+                        } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                MethodID.VIEWMESSAGES.getCommand())) {
 
-                            } else if (messageContent[1].equalsIgnoreCase(MethodID.HELP.getCommand())) {
+                            if (messageContent.length > 3){
 
-                                queryHandler.getHelp();
+                                queryHandler.invalidCommand();
 
                             } else {
 
+                                    queryHandler.viewMessages(isAdmin);
+
+                            }
+
+                        } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
+                                MethodID.DELETEJAR.getCommand())) {
+
+                            if (messageContent.length > 3){
+
                                 queryHandler.invalidCommand();
+
+                            } else {
+
+                                queryHandler.deleteJar(isAdmin);
 
                             }
 
@@ -208,13 +184,33 @@ public class CommandHandler {
 
                         }
 
+                    } else if (messageContent.length >= 2) {
+
+                        if (messageContent[1].equalsIgnoreCase(MethodID.HELLO.getCommand())) {
+
+                            queryHandler.hello();
+
+                        } else if (messageContent[1].equalsIgnoreCase(MethodID.HELP.getCommand())) {
+
+                            queryHandler.getHelp();
+
+                        } else {
+
+                            queryHandler.invalidCommand();
+
+                        }
+
+                    } else {
+
+                        queryHandler.invalidCommand();
+
                     }
 
                 }
 
-            }).start();
+            }
 
-        });
+        }).start());
 
     }
 
