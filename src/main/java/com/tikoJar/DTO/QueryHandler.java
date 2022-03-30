@@ -81,6 +81,7 @@ public class QueryHandler {
             responseBuilder.addMessageResponse(true);  // Calls message added true response
             if(checkMessageLimit()){
                  responseBuilder.messageLimitEvent(currentJar);
+                 deleteJarQuery();
             }
         }else{
             LOGGER.info("""
@@ -337,7 +338,13 @@ public class QueryHandler {
 
     public void checkExpiredJars() {
         deserializeExpiredJars();
-        if(jarLists != null)
-        responseBuilder.timeLimitEvent(this.jarLists);
+        if(jarLists != null) {
+            responseBuilder.timeLimitEvent(this.jarLists);
+            for(Jar j : this.jarLists){
+                serverId = j.getServerID();
+                deleteJarQuery();
+            }
+        }
+
     }
 }
