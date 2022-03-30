@@ -263,7 +263,22 @@ public class ResponseBuilder {
 
             String responseString = eventResponseBuilder(server, messages, api, jar);
 
-            event.getChannel().sendMessage(responseString);
+            String channelID = jar.getOpeningCondition().getServerChannelID();
+            Channel channel = server.getChannelById(channelID).orElse(null);
+
+            TextChannel textChannel = null;
+
+            if (channel != null) {
+
+                textChannel = channel.asTextChannel().orElse(null);
+
+            }
+
+            if (textChannel != null) {
+
+                textChannel.sendMessage(responseString);
+
+            }
 
         }
 
