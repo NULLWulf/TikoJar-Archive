@@ -341,10 +341,9 @@ public class QueryHandler {
         if(jarLists != null) {
             responseBuilder.timeLimitEvent(this.jarLists);
             for(Jar j : this.jarLists){
-                serverId = j.getServerID();
+                this.serverId = j.getServerID();
                 deleteJarQuery();
             }
         }
-
     }
 }
