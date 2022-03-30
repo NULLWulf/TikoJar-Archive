@@ -38,7 +38,7 @@ public class QueryHandler {
     Jar currentJar;  // is deserialized to if function is called ot do so
     ArrayList<Jar> jarLists;
 
-    final static String defaultEmpty = "{\"document\":null}";
+//    final static String defaultEmpty = "{\"document\":null}";
     final static String found1Updated1 = """
                                         {
                                         "matchedCount" : 1,
@@ -149,29 +149,29 @@ public class QueryHandler {
         return this.currentJar.getOpeningCondition().getMessageLimit() == this.currentJar.getMessages().size();
     }
 
-    public String processQuery(String query, String endPoint) {
-        try {
-            OkHttpClient client = new OkHttpClient().newBuilder().build();
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(query, mediaType);
-            String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .method("POST", body)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Access-Control-Request-Headers", "*")
-                    .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
-                    .build();
-            Response response = client.newCall(request).execute();  // execute the request
-            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - \nQuery: \n%s".formatted(endPoint, serverName, serverId, query));
-            String tempResponse = Objects.requireNonNull(response.body()).string();
-            response.close();
-            return tempResponse;
-        } catch (IOException e) {
-            LOGGER.warn(e.getMessage());
-            return defaultEmpty;
-        }
-    }
+//    public String processQuery(String query, String endPoint) {
+//        try {
+//            OkHttpClient client = new OkHttpClient().newBuilder().build();
+//            MediaType mediaType = MediaType.parse("application/json");
+//            RequestBody body = RequestBody.create(query, mediaType);
+//            String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
+//            Request request = new Request.Builder()
+//                    .url(url)
+//                    .method("POST", body)
+//                    .addHeader("Content-Type", "application/json")
+//                    .addHeader("Access-Control-Request-Headers", "*")
+//                    .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
+//                    .build();
+//            Response response = client.newCall(request).execute();  // execute the request
+//            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - \nQuery: \n%s".formatted(endPoint, serverName, serverId, query));
+//            String tempResponse = Objects.requireNonNull(response.body()).string();
+//            response.close();
+//            return tempResponse;
+//        } catch (IOException e) {
+//            LOGGER.warn(e.getMessage());
+//            return defaultEmpty;
+//        }
+//    }
 
     public Boolean checkIfJarExists() {
         LOGGER.debug("Checking if Jar Exists for %s %s".formatted(serverName, serverId));
