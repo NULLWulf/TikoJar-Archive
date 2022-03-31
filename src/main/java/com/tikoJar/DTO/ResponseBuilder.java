@@ -31,9 +31,14 @@ public class ResponseBuilder {
 
     }
 
-    public void addMessageResponse(boolean messageAdded){
+    public void addMessageResponse(boolean messageAdded, boolean lengthExceedsLimit){
 
-        if(messageAdded){
+        if (lengthExceedsLimit) {
+
+            event.getChannel().sendMessage("I'm sorry, your message is too long. Please limit your message " +
+                    "to 250 words or less.");
+
+        } else if(messageAdded){
 
             String nickname = getNickname();
             event.getChannel().sendMessage("Thanks, " + nickname + "! Your message has " +
@@ -159,15 +164,9 @@ public class ResponseBuilder {
 
     }
 
-    public void deleteMessageResponse(boolean includedMessageID, boolean messageDeleted){
+    public void deleteMessageResponse(boolean messageDeleted){
 
-        if(!includedMessageID){
-
-            // TODO: replace OUR WEB URL with actual URL
-            event.getChannel().sendMessage("I'm sorry, the message ID you have provided is invalid. " +
-                    "Please go to OUR WEB URL to see how to properly delete a message.");
-
-        } else if(!messageDeleted){
+        if(!messageDeleted){
 
             event.getChannel().sendMessage("I'm sorry, I can't delete that message. Please make sure you " +
                     "are entering the message ID correctly");
@@ -209,7 +208,7 @@ public class ResponseBuilder {
                 !tiko hello
                 !tiko help
                 !tiko view messages```
-                **For more detailed instructions, visit OUR WEB URL**"""); // TODO: replace OUR WEB URL with actual URL
+                **For more detailed instructions, visit tikojar.com**""");
 
     }
 
@@ -299,7 +298,7 @@ public class ResponseBuilder {
                 .append("Since then, you've shared so many wonderful moments with me. ").append(messages.size())
                 .append(" moments, in fact! ")
                 .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
-                .append("Please enjoy reflecting on all these fond memories** :)\n\n\n");
+                .append("Please enjoy reflecting on all these fond memories** :slight_smile:\n\n\n");
 
         for (Message message : messages) {
 
