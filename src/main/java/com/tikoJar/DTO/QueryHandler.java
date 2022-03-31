@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class QueryHandler {
@@ -68,26 +67,30 @@ public class QueryHandler {
                 """.formatted(serverId, serverName));
     }
 
-    public void addMessage(String message) {
+    public void addMessage(String message, boolean lengthExceedsLimit) {
         if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            LOGGER.info("""
+            if(!lengthExceedsLimit) {
+                LOGGER.info("""
                     Jar Exists for Server: %s
                     """.formatted(serverId));
-            if(checkIfMessageAdded(
-                    new Message(event.getMessageAuthor().getIdAsString(), message)))
-                LOGGER.info("""
+                if(checkIfMessageAdded(
+                        new Message(event.getMessageAuthor().getIdAsString(), message)))
+                    LOGGER.info("""
                     Checking if Message Added: %s
                     """.formatted(serverId));
-            responseBuilder.addMessageResponse(true);  // Calls message added true response
-            if(checkMessageLimit()){
-                 responseBuilder.messageLimitEvent(currentJar);
-                 deleteJarQuery();
+                responseBuilder.addMessageResponse(true, false);  // Calls message added true response
+                if(checkMessageLimit()){
+                    responseBuilder.messageLimitEvent(currentJar);
+                    deleteJarQuery();
+                }
+            } else {
+                responseBuilder.addMessageResponse(false, true);
             }
         }else{
             LOGGER.info("""
                     Message not Added for %s
                     """.formatted(serverId));
-            responseBuilder.addMessageResponse(false);  // Jar does not exist, pass to response builder to indicate error
+            responseBuilder.addMessageResponse(false, false);  // Jar does not exist, pass to response builder to indicate error
         }
     }
 
@@ -117,6 +120,7 @@ public class QueryHandler {
             responseBuilder.viewMessagesResponse(isAdmin, currentJar);
         }else{
             LOGGER.debug("No Jar found for : %s : %s".formatted(serverName, serverId));
+            responseBuilder.viewMessagesResponse(isAdmin, null);
         }
     }
 
@@ -125,10 +129,10 @@ public class QueryHandler {
         if(includedMessageID){
             if(checkIfJarExists()){
                 deleteMessageQuery(messageID);
-                messageDeleted = true;
+                messageDeleted = true; // TODO: THIS SHOULD ONLY BE TRUE IF THE MESSAGE ACTUALLY EXISTED AND WAS DELETED
             }
         }
-        responseBuilder.deleteMessageResponse(includedMessageID, messageDeleted);
+        responseBuilder.deleteMessageResponse(messageDeleted);
     }
 
     public void deleteJar(boolean isAdmin){  // Completed finished testing and working
@@ -228,13 +232,14 @@ public class QueryHandler {
             ObjectMapper mapper = new ObjectMapper();
 
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
+            this.jarLists = mapper.readValue(stripped, new TypeReference<>() {
+            });
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.currentJar));
         }catch (JsonProcessingException e){
             LOGGER.warn(e.getMessage());
         }
     }
-
+    
     private void deserializeAllJars() {
         try {
             String checkJarExistsQuery = """
@@ -251,7 +256,8 @@ public class QueryHandler {
 
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-            this.jarLists = mapper.readValue(stripped, new TypeReference<ArrayList<Jar>>(){});
+            this.jarLists = mapper.readValue(stripped, new TypeReference<>() {
+            });
 
             LOGGER.debug("Deserialized Jar Output) " + new JSON_Handler().getObjAsJSONString(this.jarLists));
         }catch (JsonProcessingException e){

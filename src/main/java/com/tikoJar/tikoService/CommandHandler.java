@@ -69,23 +69,29 @@ public class CommandHandler {
 
                         if (messageContent[1].equalsIgnoreCase(MethodID.ADDMESSAGE.getCommand())) {
 
-                            // TODO: ADD MESSAGE LENGTH LIMIT (250 WORDS)
-
                             StringBuilder message = new StringBuilder();
 
                             message.append(messageContent[2]);
 
-                            if (messageContent.length > 3){
+                            if (messageContent.length <= 253) {
 
-                                for (int i = 3; i < messageContent.length; i++){
+                                if (messageContent.length > 3){
 
-                                    message.append(" ");
-                                    message.append(messageContent[i]);
+                                    for (int i = 3; i < messageContent.length; i++){
+
+                                        message.append(" ");
+                                        message.append(messageContent[i]);
+
+                                    }
 
                                 }
+                                queryHandler.addMessage(message.toString(), false);
+
+                            } else {
+
+                                queryHandler.addMessage(null, true);
 
                             }
-                            queryHandler.addMessage(message.toString());
 
                         } else if ((messageContent[1] + " " + messageContent[2]).equalsIgnoreCase(
                                 MethodID.DELETEMESSAGE.getCommand())) {
