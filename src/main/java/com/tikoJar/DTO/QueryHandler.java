@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class QueryHandler {
+public class QueryHandler implements MNDPOINT {
 
     public static final Logger LOGGER = LogManager.getLogger("QueryHandler.class");
     private MessageCreateEvent event;
@@ -37,7 +37,7 @@ public class QueryHandler {
     Jar currentJar;  // is deserialized to if function is called ot do so
     ArrayList<Jar> jarLists;
 
-//    final static String defaultEmpty = "{\"document\":null}";
+    final static String defaultEmpty = "{\"document\":null}";
     final static String found1Updated1 = """
                                         {
                                         "matchedCount" : 1,
@@ -185,7 +185,7 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        String postResponse = processQuery(checkJarExistsQuery,ENDPT.FIND.get());
+        String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.FIND1);
         LOGGER.debug("-- Jar Exists Post Response --\n%s".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
@@ -197,7 +197,7 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
+        String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.DELETE1);
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
@@ -212,7 +212,7 @@ public class QueryHandler {
                "update": {
                    "$pull": {"messages":{"messageId":"%s"}}}}
                 """.formatted(serverId, messageId);
-        String postResponse = processQuery(checkJarExistsQuery,ENDPT.UPDATE.get());
+        String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.UPDATE1);
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
@@ -225,7 +225,7 @@ public class QueryHandler {
                 "filter": { "openingCondition.hasMessageLimit": { "$eq" : false },
                             "openingCondition.openingDate": { "$eq" : "%s" }}}
                 """.formatted(LocalDate.now().toString());
-            String postResponse = processQuery(checkAndReturnExpired,ENDPT.FINDALL.get());
+            String postResponse = processQuery(checkAndReturnExpired,MNDPOINT.FINDALL);
             LOGGER.debug("Deserialize All Expired Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Expired Post Strip/n%s".formatted(stripped));
@@ -247,7 +247,7 @@ public class QueryHandler {
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar"}
                 """;
-            String postResponse = processQuery(checkJarExistsQuery,ENDPT.FINDALL.get());
+            String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.FINDALL);
             LOGGER.debug("Deserialize All Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, true);
             LOGGER.debug("Deserialize All Post Strip/n%s".formatted(stripped));
@@ -273,7 +273,7 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}}
                 """.formatted(serverId);
-            String postResponse = processQuery(pullJar,ENDPT.FIND.get());
+            String postResponse = processQuery(pullJar,MNDPOINT.FIND1);
             LOGGER.debug("Deserialize pullJar Post Response/n%s".formatted(postResponse));
             String stripped = stripDocument(postResponse, false);
             LOGGER.debug("Deserialize pullJar Strip/n%s".formatted(stripped));
@@ -298,7 +298,7 @@ public class QueryHandler {
                 "update": {
                     "$push": {"messages": %s}}}
                 """.formatted(serverId, new JSON_Handler().getObjAsJSONString(addMessage).stripIndent());  // converts newMessage to JSON format
-        String postResponse = processQuery(addMessageQuery,ENDPT.UPDATE.get());  // Sends query to HTTP Request Template
+        String postResponse = processQuery(addMessageQuery,MNDPOINT.UPDATE1);  // Sends query to HTTP Request Template
         LOGGER.debug("-- Check if Message Added Post Response --\n%s".formatted(postResponse));
         return !Objects.equals(postResponse, defaultEmpty);
     }
@@ -320,7 +320,7 @@ public class QueryHandler {
                     "dataSource":"PositivityJar",
                     "document": %s}
                 """.formatted(new JSON_Handler().getObjAsJSONString(jar).stripIndent());
-        String postResponse = processQuery(createJarQuery,ENDPT.INSERT.get());
+        String postResponse = processQuery(createJarQuery,MNDPOINT.INSERT1);
         LOGGER.debug("-- Check if Jar Created Post Response --\n%s".formatted(postResponse));
     }
     public void getHelp(){
