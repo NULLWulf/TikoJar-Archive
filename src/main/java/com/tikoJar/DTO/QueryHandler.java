@@ -197,7 +197,7 @@ public class QueryHandler {
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        String postResponse = processQuery(checkJarExistsQuery,ENDPOINT.);
+        String postResponse = processQuery(checkJarExistsQuery,ENDPT.DELETE.get());
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
