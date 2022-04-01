@@ -128,8 +128,11 @@ public class QueryHandler implements MNDPOINT {
         boolean messageDeleted = false;
         if(includedMessageID){
             if(checkIfJarExists()){
-                deleteMessageQuery(messageID);
-                messageDeleted = true; // TODO: THIS SHOULD ONLY BE TRUE IF THE MESSAGE ACTUALLY EXISTED AND WAS DELETED
+                String compare = deleteMessageQuery(messageID);
+                if(Objects.equals(compare, found1Updated1)){
+                    messageDeleted = true;
+                }
+                 // TODO: THIS SHOULD ONLY BE TRUE IF THE MESSAGE ACTUALLY EXISTED AND WAS DELETED
             }
         }
         responseBuilder.deleteMessageResponse(messageDeleted);
@@ -201,8 +204,8 @@ public class QueryHandler implements MNDPOINT {
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
-    public void deleteMessageQuery(String messageId) {
-        String checkJarExistsQuery = """
+    public String deleteMessageQuery(String messageId) {
+        String deleteJarQuery = """
                {"collection": "Jars",
                "database": "TikoJarTest",
                "dataSource": "PositivityJar",
@@ -212,8 +215,9 @@ public class QueryHandler implements MNDPOINT {
                "update": {
                    "$pull": {"messages":{"messageId":"%s"}}}}
                 """.formatted(serverId, messageId);
-        String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.UPDATE1);
+        String postResponse = processQuery(deleteJarQuery,MNDPOINT.UPDATE1);
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
+        return postResponse;
     }
 
     private void deserializeExpiredJars() {
