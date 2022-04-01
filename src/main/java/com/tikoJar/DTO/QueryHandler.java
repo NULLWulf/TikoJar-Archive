@@ -37,7 +37,7 @@ public class QueryHandler {
     Jar currentJar;  // is deserialized to if function is called ot do so
     ArrayList<Jar> jarLists;
 
-//    final static String defaultEmpty = "{\"document\":null}";
+   final static String defaultEmpty = "{\"document\":null}";
     final static String found1Updated1 = """
                                         {
                                         "matchedCount" : 1,
