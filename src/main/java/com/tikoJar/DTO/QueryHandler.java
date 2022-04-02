@@ -133,7 +133,6 @@ public class QueryHandler implements MNDPOINT {
                 if(Objects.equals(compare, found1Updated1)){
                     messageDeleted = true;
                 }
-                 // TODO: THIS SHOULD ONLY BE TRUE IF THE MESSAGE ACTUALLY EXISTED AND WAS DELETED
             }
         }
         responseBuilder.deleteMessageResponse(messageDeleted);
