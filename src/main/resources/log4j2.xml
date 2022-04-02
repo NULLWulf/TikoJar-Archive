@@ -8,8 +8,7 @@
 
     <Loggers>
         <Logger name="com.tikoJar.DTO" level="OFF" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="SMTP"/>
+            <AppenderRef ref="Console"/>=
         </Logger>
         <Root level="OFF">
             <AppenderRef ref="Console"/>

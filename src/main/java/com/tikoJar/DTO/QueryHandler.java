@@ -38,6 +38,9 @@ public class QueryHandler implements MNDPOINT {
     ArrayList<Jar> jarLists;
 
     final static String defaultEmpty = "{\"document\":null}";
+    final static String found1Updated1 = """
+            {"matchedCount":1,"modifiedCount":1}""";
+
 
     public QueryHandler(){
         responseBuilder = new ResponseBuilder();
@@ -91,28 +94,25 @@ public class QueryHandler implements MNDPOINT {
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
         boolean nonZeroLimitSet = true;
+        boolean createdJar = false;
 
         if(validSyntax && isAdmin){
-
             if (!checkIfJarExists()){
-
                 if (messageLimit == 0 && timeLimitInDays == 0){
                     nonZeroLimitSet = false;
                 } else if (messageLimit != 0){
                     createJarQuery(new Jar(this.serverId,new OpeningCondition(true, messageLimit,
                             0 , event.getChannel().getIdAsString())));
+                    createdJar = true;
                 }
                 else {
                     createJarQuery(new Jar(this.serverId, new OpeningCondition(false, 0,
                             timeLimitInDays, event.getChannel().getIdAsString())));
+                    createdJar = true;
                 }
-                responseBuilder.createJarResponse(true, true,true, nonZeroLimitSet);
-            }else{
-                responseBuilder.createJarResponse(true, true,false, nonZeroLimitSet);
             }
-        }else{
-            responseBuilder.createJarResponse(validSyntax, isAdmin, false, nonZeroLimitSet);
         }
+        responseBuilder.createJarResponse(validSyntax, isAdmin, createdJar, nonZeroLimitSet);
     }
 
     public void viewMessages(boolean isAdmin) {
