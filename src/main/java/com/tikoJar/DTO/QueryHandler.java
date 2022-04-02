@@ -95,9 +95,15 @@ public class QueryHandler {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
+        boolean nonZeroLimitSet = true;
+
         if(validSyntax && isAdmin){
+
             if (!checkIfJarExists()){
-                if (messageLimit != 0){
+
+                if (messageLimit == 0 && timeLimitInDays == 0){
+                    nonZeroLimitSet = false;
+                } else if (messageLimit != 0){
                     createJarQuery(new Jar(this.serverId,new OpeningCondition(true, messageLimit,
                             0 , event.getChannel().getIdAsString())));
                 }
@@ -105,12 +111,12 @@ public class QueryHandler {
                     createJarQuery(new Jar(this.serverId, new OpeningCondition(false, 0,
                             timeLimitInDays, event.getChannel().getIdAsString())));
                 }
-                responseBuilder.createJarResponse(true, true,true);
+                responseBuilder.createJarResponse(true, true,true, nonZeroLimitSet);
             }else{
-                responseBuilder.createJarResponse(true, true,false);
+                responseBuilder.createJarResponse(true, true,false, nonZeroLimitSet);
             }
         }else{
-            responseBuilder.createJarResponse(validSyntax, isAdmin, false);
+            responseBuilder.createJarResponse(validSyntax, isAdmin, false, nonZeroLimitSet);
         }
     }
 
