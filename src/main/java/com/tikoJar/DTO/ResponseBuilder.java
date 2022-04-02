@@ -53,12 +53,12 @@ public class ResponseBuilder {
         }
     }
 
-    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean createdJar) {
+    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean createdJar, boolean nonZeroLimitSet) {
 
         if(!validSyntax){
 
             event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
-                    "Please go to OUR WEB URL to see how to properly create a jar.");
+                    "Please visit tikojar.com to see how to properly create a jar.");
 
         } else if(!isAdmin){
 
@@ -69,6 +69,11 @@ public class ResponseBuilder {
             event.getChannel().sendMessage("Hmmm... it looks like your server already has a jar. " +
                     "If you would like to replace it, please delete the current jar first. " +
                     "You may then create a new jar.");
+
+        } else if (!nonZeroLimitSet) {
+
+            event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
+                    "Please visit tikojar.com to see how to properly create a jar.");
 
         } else {
 
@@ -96,17 +101,26 @@ public class ResponseBuilder {
                 Server server = event.getServer().orElse(null);
                 String userID = event.getMessageAuthor().getIdAsString();
 
+                String serverName = "Unknown Server";
+
+                if (server != null) {
+
+                    serverName = server.getName();
+
+                }
+
                 int messageDisplayCount = 0;
 
                 if (isAdmin) {
 
-                    responseString.append("**Showing all messages:**\n\n");
+                    responseString.append("**Showing all messages on " + serverName + ":**\n\n");
 
                 } else {
 
                     String nickname = getNickname();
 
-                    responseString.append("**Showing messages submitted by ").append(nickname).append(":**\n\n");
+                    responseString.append("**Showing messages submitted by ").append(nickname).append(" " +
+                            "on " + serverName + ":**\n\n");
 
                 }
 
