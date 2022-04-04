@@ -66,48 +66,46 @@ public class QueryHandler implements MNDPOINT {
     }
 
     public void addMessage(String message, boolean lengthExceedsLimit) {
-        if(checkIfJarExists()){  // HTTP Requests to see if jar exists
-            if(!lengthExceedsLimit) {
+        boolean messageAdded = false;
+        if (checkIfJarExists()) {  // HTTP Requests to see if jar exists
+            if (!lengthExceedsLimit) {
                 LOGGER.info("""
-                    Jar Exists for Server: %s
-                    """.formatted(serverId));
-                if(checkIfMessageAdded(
-                        new Message(event.getMessageAuthor().getIdAsString(), message)))
-                    LOGGER.info("""
-                    Checking if Message Added: %s
-                    """.formatted(serverId));
-                responseBuilder.addMessageResponse(true, false);  // Calls message added true response
-                if(checkMessageLimit()){
-                    responseBuilder.messageLimitEvent(currentJar);
-                    deleteJarQuery();
+                        Jar Exists for Server: %s
+                        """.formatted(serverId));
+                messageAdded = checkIfMessageAdded(new Message(event.getMessageAuthor().getIdAsString(), message));
+                responseBuilder.addMessageResponse(messageAdded, false);
+                LOGGER.info("""
+                        Checking if Message Added: %s
+                        """.formatted(serverId));
+                if (messageAdded) {
+                    if (checkMessageLimit()) {
+                        responseBuilder.messageLimitEvent(currentJar);
+                        deleteJarQuery(this.serverId);
+                    }
                 }
             } else {
                 responseBuilder.addMessageResponse(false, true);
             }
-        }else{
-            LOGGER.info("""
-                    Message not Added for %s
-                    """.formatted(serverId));
-            responseBuilder.addMessageResponse(false, false);  // Jar does not exist, pass to response builder to indicate error
+        } else {
+            responseBuilder.addMessageResponse(false, lengthExceedsLimit);
         }
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
         boolean nonZeroLimitSet = true;
         boolean createdJar = false;
-
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
                 if (messageLimit == 0 && timeLimitInDays == 0){
                     nonZeroLimitSet = false;
-                } else if (messageLimit != 0){
-                    createJarQuery(new Jar(this.serverId,new OpeningCondition(true, messageLimit,
-                            0 , event.getChannel().getIdAsString())));
-                    createdJar = true;
-                }
-                else {
-                    createJarQuery(new Jar(this.serverId, new OpeningCondition(false, 0,
-                            timeLimitInDays, event.getChannel().getIdAsString())));
+                }else {
+                    if (messageLimit != 0) {
+                        createJarQuery(new Jar(this.serverId, new OpeningCondition(true, messageLimit,
+                                0, event.getChannel().getIdAsString())));
+                    } else {
+                        createJarQuery(new Jar(this.serverId, new OpeningCondition(false, 0,
+                                timeLimitInDays, event.getChannel().getIdAsString())));
+                    }
                     createdJar = true;
                 }
             }
@@ -142,7 +140,7 @@ public class QueryHandler implements MNDPOINT {
         boolean jarDeleted = false;
         if(isAdmin){
             if(checkIfJarExists()){
-                deleteJarQuery();
+                deleteJarQuery(this.serverId);
                 jarDeleted = true;
             }
         }
@@ -193,25 +191,14 @@ public class QueryHandler implements MNDPOINT {
         return !Objects.equals(postResponse, defaultEmpty);
     }
 
-    public void deleteJarQuery() {
+    public void deleteJarQuery(String servId) {
         String deleteJarQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
-                """.formatted(serverId);
+                """.formatted(servId);
         String postResponse = processQuery(deleteJarQuery,MNDPOINT.DELETE1);
-        LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
-    }
-
-    public void deleteTimedJar(String timeServID) {
-        String deleteTimedJarQuery = """
-                {"collection":"Jars",
-                "database":"TikoJarTest",
-                "dataSource":"PositivityJar",
-                "filter": { "serverID": "%s" }}
-                """.formatted(timeServID);
-        String postResponse = processQuery(deleteTimedJarQuery,MNDPOINT.DELETE1);
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
@@ -363,7 +350,7 @@ public class QueryHandler implements MNDPOINT {
             responseBuilder.timeLimitEvent(this.jarLists);
             for(Jar j : this.jarLists){
                 String tempServerId = j.getServerID();
-                deleteTimedJar(tempServerId);
+                deleteJarQuery(tempServerId);
             }
         }
     }
