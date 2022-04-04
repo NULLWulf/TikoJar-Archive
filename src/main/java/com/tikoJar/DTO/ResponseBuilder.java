@@ -64,16 +64,16 @@ public class ResponseBuilder {
 
             event.getChannel().sendMessage("I'm sorry, only a server admin can perform this task.");
 
+        } else if (!nonZeroLimitSet) {
+
+            event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
+                    "Please visit tikojar.com to see how to properly create a jar.");
+
         } else if (!createdJar) {
 
             event.getChannel().sendMessage("Hmmm... it looks like your server already has a jar. " +
                     "If you would like to replace it, please delete the current jar first. " +
                     "You may then create a new jar.");
-
-        } else if (!nonZeroLimitSet) {
-
-            event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
-                    "Please visit tikojar.com to see how to properly create a jar.");
 
         } else {
 
@@ -92,7 +92,7 @@ public class ResponseBuilder {
 
         } else {
 
-            StringBuilder responseString = new StringBuilder();
+            ArrayList<String> messagesOutput = new ArrayList<>();
 
             ArrayList<Message> messages = jar.getMessages();
 
@@ -113,14 +113,14 @@ public class ResponseBuilder {
 
                 if (isAdmin) {
 
-                    responseString.append("**Showing all messages on " + serverName + ":**\n\n");
+                    messagesOutput.add("```Showing all messages on " + serverName + ":```");
 
                 } else {
 
                     String nickname = getNickname();
 
-                    responseString.append("**Showing messages submitted by ").append(nickname).append(" " +
-                            "on " + serverName + ":**\n\n");
+                    messagesOutput.add("**Showing messages submitted by " + nickname + " on " +
+                            "" + serverName + ":**\n\n");
 
                 }
 
@@ -128,6 +128,8 @@ public class ResponseBuilder {
 
 
                     if (isAdmin || message.getUserID().equals(userID)) {
+
+                        StringBuilder messageOutput = new StringBuilder();
 
                         String date = message.getDatePosted();
                         String messageID = message.getMessageId();
@@ -143,11 +145,13 @@ public class ResponseBuilder {
 
                         }
 
-                        responseString
+                        messageOutput
                                 .append("***Message submitted by ").append(nickname).append(" on ").append(date)
                                 .append(" (message ID #").append(messageID).append("):***\n").append(messageContent)
                                 .append("\n\n")
                         ;
+
+                        messagesOutput.add(messageOutput.toString());
 
                         messageDisplayCount++;
 
@@ -157,8 +161,12 @@ public class ResponseBuilder {
 
                 if (messageDisplayCount > 0) {
 
-                    event.getMessageAuthor().asUser().ifPresent(invokingUser ->
-                            invokingUser.sendMessage(responseString.toString()));
+                    for (String message: messagesOutput){
+
+                        event.getMessageAuthor().asUser().ifPresent(invokingUser ->
+                                invokingUser.sendMessage(message));
+
+                    }
 
                     event.getChannel().sendMessage("I have sent you a list via DM.");
 
@@ -216,13 +224,14 @@ public class ResponseBuilder {
 
         event.getChannel().sendMessage("""
                 **Here's a list of my commands:** ```!tiko add <positive message>
-                !tiko create <JAR DETAILS>
+                !tiko create m <number of messages>
+                !tiko create t <number of days>
                 !tiko delete jar
                 !tiko delete message <message ID>
                 !tiko hello
                 !tiko help
                 !tiko view messages```
-                **For more detailed instructions, visit tikojar.com**""");
+                **For more detailed instructions, visit http://www.tikojar.com**""");
 
     }
 
@@ -241,7 +250,7 @@ public class ResponseBuilder {
             // skips jar if server no longer exists
             if(server != null) {
 
-                String responseString = eventResponseBuilder(server, messages, api, jar);
+                ArrayList<String> messageOutput = eventResponseBuilder(server, messages, api, jar);
 
                 String channelID = jar.getOpeningCondition().getServerChannelID();
                 Channel channel = server.getChannelById(channelID).orElse(null);
@@ -256,7 +265,11 @@ public class ResponseBuilder {
 
                 if (textChannel != null) {
 
-                    textChannel.sendMessage(responseString);
+                    for (String message: messageOutput){
+
+                        textChannel.sendMessage(message);
+
+                    }
 
                 }
 
@@ -274,7 +287,7 @@ public class ResponseBuilder {
 
         if (server != null) {
 
-            String responseString = eventResponseBuilder(server, messages, api, jar);
+            ArrayList<String> messageOutput = eventResponseBuilder(server, messages, api, jar);
 
             String channelID = jar.getOpeningCondition().getServerChannelID();
             Channel channel = server.getChannelById(channelID).orElse(null);
@@ -289,7 +302,11 @@ public class ResponseBuilder {
 
             if (textChannel != null) {
 
-                textChannel.sendMessage(responseString);
+                for (String message: messageOutput){
+
+                    textChannel.sendMessage(message);
+
+                }
 
             }
 
@@ -297,24 +314,23 @@ public class ResponseBuilder {
 
     }
 
-    public String eventResponseBuilder(Server server, ArrayList<Message> messages, DiscordApi api, Jar jar){
-
-        StringBuilder responseString = new StringBuilder();
+    public ArrayList<String> eventResponseBuilder(Server server, ArrayList<Message> messages, DiscordApi api, Jar jar){
 
         String serverName = server.getName();
         String creationDate = jar.getOpeningCondition().getCreationDate();
 
-        responseString.append("**Good day, ").append(serverName).append("! ")
-                .append("""
-                        And what a glorious day it is, for today is the day of your server's jar opening event!
+        ArrayList<String> messagesOutput = new ArrayList<>();
 
-                        """).append("I remember when you created this jar, back on ").append(creationDate).append(". ")
-                .append("Since then, you've shared so many wonderful moments with me. ").append(messages.size())
-                .append(" moments, in fact! ")
-                .append("Now, it is my pleasure to re-share all those moments with all of *you!* \n\n")
-                .append("Please enjoy reflecting on all these fond memories** :slight_smile:\n\n\n");
+        messagesOutput.add("**Good day, " + serverName + "!\n\n" +
+                "And what a glorious day it is, for today is the day of your server's jar opening event!\n\n" +
+                "I remember when you created this jar, back on " + creationDate + ". Since then, you've shared so " +
+                "many wonderful moments with me. " + messages.size() +  " moments, in fact!\n\n" +
+                "Now, it is my pleasure to re-share all those moments with all of *you!* \n\n" +
+                "Please enjoy reflecting on all these fond memories** :slight_smile:\n");
 
         for (Message message : messages) {
+
+            StringBuilder messageString = new StringBuilder();
 
             String date = message.getDatePosted();
             String messageContent = message.getMessageContent();
@@ -329,14 +345,15 @@ public class ResponseBuilder {
 
             }
 
-            responseString
+            messageString
                     .append("***Message submitted by ").append(nickname).append(" on ").append(date)
                     .append(":***\n").append(messageContent).append("\n\n")
             ;
 
+            messagesOutput.add(messageString.toString());
         }
 
-        return responseString.toString();
+        return messagesOutput;
     }
 
     public void helloResponse(){
