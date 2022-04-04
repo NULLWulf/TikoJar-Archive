@@ -194,13 +194,24 @@ public class QueryHandler implements MNDPOINT {
     }
 
     public void deleteJarQuery() {
-        String checkJarExistsQuery = """
+        String deleteJarQuery = """
                 {"collection":"Jars",
                 "database":"TikoJarTest",
                 "dataSource":"PositivityJar",
                 "filter": { "serverID": "%s" }}
                 """.formatted(serverId);
-        String postResponse = processQuery(checkJarExistsQuery,MNDPOINT.DELETE1);
+        String postResponse = processQuery(deleteJarQuery,MNDPOINT.DELETE1);
+        LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
+    }
+
+    public void deleteTimedJar(String timeServID) {
+        String deleteTimedJarQuery = """
+                {"collection":"Jars",
+                "database":"TikoJarTest",
+                "dataSource":"PositivityJar",
+                "filter": { "serverID": "%s" }}
+                """.formatted(timeServID);
+        String postResponse = processQuery(deleteTimedJarQuery,MNDPOINT.DELETE1);
         LOGGER.debug("-- Jar Deleted Post Response --\n%s".formatted(postResponse));
     }
 
@@ -351,8 +362,8 @@ public class QueryHandler implements MNDPOINT {
         if(jarLists != null) {
             responseBuilder.timeLimitEvent(this.jarLists);
             for(Jar j : this.jarLists){
-                this.serverId = j.getServerID();
-                deleteJarQuery();
+                String tempServerId = j.getServerID();
+                deleteTimedJar(tempServerId);
             }
         }
     }
