@@ -7,10 +7,10 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="com.tikoJar.DTO" level="DEBUG" additivity="false">
+        <Logger name="com.tikoJar.DTO" level="OFF" additivity="false">
             <AppenderRef ref="Console"/>=
         </Logger>
-        <Root level="DEBUG">
+        <Root level="OFF">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

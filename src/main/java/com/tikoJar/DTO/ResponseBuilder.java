@@ -37,7 +37,7 @@ public class ResponseBuilder {
         if (lengthExceedsLimit) {
 
             event.getChannel().sendMessage("I'm sorry, your message is too long. Please limit your message " +
-                    "to 250 words or less.");
+                    "to 250 characters or less.");
 
         } else if(messageAdded){
 
