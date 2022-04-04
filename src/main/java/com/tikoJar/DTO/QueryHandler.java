@@ -31,7 +31,7 @@ public class QueryHandler implements MNDPOINT {
     DiscordApi api;
 
     String serverId;  // serverID are Long data types
-    String serverName; // serverNames are strinde
+    String serverName; // serverNames are strings
     ResponseBuilder responseBuilder;  // instantiated based on need
 
     Jar currentJar;  // is deserialized to if function is called ot do so
