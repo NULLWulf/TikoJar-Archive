@@ -78,18 +78,19 @@ public class CommandHandler {
 
                                 message.append(messageContent[2]);
 
-                                if (messageContent.length <= 253) {
+                                if (messageContent.length > 3){
 
-                                    if (messageContent.length > 3){
+                                    for (int i = 3; i < messageContent.length; i++){
 
-                                        for (int i = 3; i < messageContent.length; i++){
-
-                                            message.append(" ");
-                                            message.append(messageContent[i]);
-
-                                        }
+                                        message.append(" ");
+                                        message.append(messageContent[i]);
 
                                     }
+
+                                }
+
+                                if (message.toString().length() <= 250) {
+
                                     queryHandler.addMessage(message.toString(), false);
 
                                 } else {
