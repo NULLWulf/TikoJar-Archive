@@ -92,14 +92,14 @@ public class QueryHandler implements MNDPOINT {
     }
 
     public void createJar(boolean validSyntax, boolean isAdmin, int messageLimit, int timeLimitInDays)  {
-        boolean nonZeroLimitSet = true;
+        boolean positiveLimitSet = true;
         boolean createdJar = false;
         if(validSyntax && isAdmin){
             if (!checkIfJarExists()){
-                if (messageLimit == 0 && timeLimitInDays == 0){
-                    nonZeroLimitSet = false;
+                if (messageLimit <= 0 && timeLimitInDays <= 0){
+                    positiveLimitSet = false;
                 }else {
-                    if (messageLimit != 0) {
+                    if (messageLimit > 0) {
                         createJarQuery(new Jar(this.serverId, new OpeningCondition(true, messageLimit,
                                 0, event.getChannel().getIdAsString())));
                     } else {
@@ -110,7 +110,7 @@ public class QueryHandler implements MNDPOINT {
                 }
             }
         }
-        responseBuilder.createJarResponse(validSyntax, isAdmin, createdJar, nonZeroLimitSet);
+        responseBuilder.createJarResponse(validSyntax, isAdmin, createdJar, positiveLimitSet);
     }
 
     public void viewMessages(boolean isAdmin) {
@@ -149,8 +149,6 @@ public class QueryHandler implements MNDPOINT {
 
     public boolean checkMessageLimit(){  // Checks Message Limit store in Opening Condition with Size
         deserializeJar();
-        System.out.println(this.currentJar
-                .getOpeningCondition().getMessageLimit() + " " + this.currentJar.getMessages().size());
         return this.currentJar.getOpeningCondition().getMessageLimit() == this.currentJar.getMessages().size();
     }
 

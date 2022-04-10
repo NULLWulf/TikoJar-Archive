@@ -54,7 +54,7 @@ public class ResponseBuilder {
         }
     }
 
-    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean createdJar, boolean nonZeroLimitSet) {
+    public void createJarResponse(boolean validSyntax, boolean isAdmin, boolean createdJar, boolean positiveLimitSet) {
 
         if(!validSyntax){
 
@@ -65,7 +65,7 @@ public class ResponseBuilder {
 
             event.getChannel().sendMessage("I'm sorry, only a server admin can perform this task.");
 
-        } else if (!nonZeroLimitSet) {
+        } else if (!positiveLimitSet) {
 
             event.getChannel().sendMessage("I'm sorry, I can't create a jar with those details. " +
                     "Please visit tikojar.com to see how to properly create a jar.");
