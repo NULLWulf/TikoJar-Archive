@@ -157,13 +157,13 @@ public class QueryHandler implements MNDPOINT {
            OkHttpClient client = new OkHttpClient().newBuilder().build();
            MediaType mediaType = MediaType.parse("application/json");
            RequestBody body = RequestBody.create(query, mediaType);
-           String url = "https://data.mongodb-api.com/app/data-rlgbq/endpoint/data/beta/action/%s".formatted(endPoint);
+           String url = "https://data.mongodb-api.com/app/data-XXXXX/endpoint/data/beta/action/%s".formatted(endPoint);
            Request request = new Request.Builder()
                    .url(url)
                    .method("POST", body)
                    .addHeader("Content-Type", "application/json")
                    .addHeader("Access-Control-Request-Headers", "*")
-                   .addHeader("api-key", "TUGyzJPmesVH4FcrDqO0XovgYNq0L5B59xCnjFsB9nLFE7qkofdTvzYjBn2ID120")
+                   .addHeader("api-key", "MY-API-KEY")
                    .build();
            Response response = client.newCall(request).execute();  // execute the request
            LOGGER.debug("Process Query for Endpoint %s Called for %s %s - \nQuery: \n%s".formatted(endPoint, serverName, serverId, query));

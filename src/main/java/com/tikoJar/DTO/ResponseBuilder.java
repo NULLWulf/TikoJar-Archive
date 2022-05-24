@@ -383,6 +383,5 @@ public class ResponseBuilder {
         }
 
         return "";
-
     }
 }
